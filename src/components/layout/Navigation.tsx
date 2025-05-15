@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Home, ListChecks, History, Edit3 } from 'lucide-react'; 
+import { Home, ListChecks, History } from 'lucide-react'; 
 
 const navItems = [
   { href: '/home', label: 'Home', icon: Home },
@@ -12,11 +12,21 @@ const navItems = [
   { href: '/previous-submissions', label: 'Previous Entries', icon: History },
 ];
 
-export function Navigation() {
+interface NavigationProps {
+  onLinkClick?: () => void; // Optional callback for when a link is clicked
+}
+
+export function Navigation({ onLinkClick }: NavigationProps) {
   const pathname = usePathname();
 
+  const handleLinkClick = () => {
+    if (onLinkClick) {
+      onLinkClick();
+    }
+  };
+
   return (
-    <nav className="bg-card/70 backdrop-blur-sm p-4 rounded-lg shadow-lg">
+    <nav className="bg-transparent p-0 md:bg-card/70 md:backdrop-blur-sm md:p-4 md:rounded-lg md:shadow-lg"> {/* Adjust background for sheet vs potential desktop */}
       <ul className="flex flex-col space-y-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href === '/home' && pathname === '/');
@@ -24,6 +34,7 @@ export function Navigation() {
             <li key={item.href}>
               <Link
                 href={item.href}
+                onClick={handleLinkClick} // Call the handler to close the sheet
                 className={cn(
                   'flex items-center space-x-3 px-4 py-3 rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-200 ease-in-out group',
                   isActive 
@@ -41,5 +52,3 @@ export function Navigation() {
     </nav>
   );
 }
-
-    

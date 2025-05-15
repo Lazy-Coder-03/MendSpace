@@ -114,7 +114,11 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogCancel 
+                        className="bg-[linear-gradient(to_right,hsl(0,85%,88%),hsl(25,85%,85%))] text-primary-foreground border-transparent hover:brightness-105 shadow-md hover:shadow-lg"
+                      >
+                        Cancel
+                      </AlertDialogCancel>
                       <AlertDialogAction 
                         onClick={handleDeleteConfirm} 
                         disabled={isDeleting}

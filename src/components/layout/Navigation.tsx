@@ -8,8 +8,8 @@ import { Home, ListChecks, History } from 'lucide-react';
 
 const navItems = [
   { href: '/home', label: 'Home', icon: Home },
-  { href: '/submissions', label: 'Submissions', icon: ListChecks },
-  { href: '/previous-submissions', label: 'Previous Entries', icon: History },
+  { href: '/submissions', label: 'Recent Submissions', icon: ListChecks },
+  { href: '/previous-submissions', label: 'All Entries', icon: History },
 ];
 
 interface NavigationProps {

@@ -70,7 +70,7 @@ export default function PreviousSubmissionsPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-lg text-muted-foreground">Loading all previous entries...</p>
+        <p className="mt-4 text-lg text-muted-foreground">Loading all entries...</p>
       </div>
     );
   }
@@ -100,7 +100,7 @@ export default function PreviousSubmissionsPage() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-3xl font-bold mb-2 text-gray-700 dark:text-gray-300">All Previous Entries</h1>
+        <h1 className="text-3xl font-bold mb-2 text-gray-700 dark:text-gray-300">All Entries</h1>
         <p className="text-muted-foreground">
           Browse through all past entries. {userIsAdmin ? "You can edit your own." : "Entries are view-only for you."}
         </p>

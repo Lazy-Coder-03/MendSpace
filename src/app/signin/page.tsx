@@ -3,7 +3,7 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithRedirect } from 'firebase/auth';
 import { auth, googleProvider } from '@/firebase/config';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -35,34 +35,21 @@ export default function SignInPage() {
   const handleSignIn = async () => {
     setIsSigningIn(true);
     try {
-      console.log("Attempting Google Sign-In...");
-      const result = await signInWithPopup(auth, googleProvider);
-      console.log("Google Sign-In successful for user:", result.user?.displayName, "(UID:", result.user?.uid, ")");
-      // The AuthProvider's onAuthStateChanged will handle redirection and access checks.
+      console.log("Attempting Google Sign-In with redirect...");
+      await signInWithRedirect(auth, googleProvider);
+      // After signInWithRedirect, the page will navigate away.
+      // The user's state will be handled by onAuthStateChanged in FirebaseProvider upon return.
     } catch (error: any) {
-      console.error("Google Sign-In Error Raw:", error); 
-      if (error.code === 'auth/popup-closed-by-user') {
-        console.warn(
-          "Google Sign-In: Firebase reported 'auth/popup-closed-by-user'. " +
-          "This can happen if you manually closed the sign-in window, or more likely due to: \n" +
-          "1. Browser extensions (like popup blockers or privacy tools).\n" +
-          "2. Network issues or firewalls.\n" +
-          "3. CRITICAL: Your Firebase project's 'Authorized Domains' list in the Firebase Console (Authentication -> Sign-in method) might not include the domain you are running this app from.\n" +
-          "4. Other interference with the popup.\n" +
-          "If you did not close it, please check your Firebase project's 'Authorized Domains' list first. Then, try disabling browser extensions or using an incognito window."
-        );
-        // No toast for this specific error, as it's often not a direct user fault or code bug.
-      } else {
-        console.error("Google Sign-In Error Processed: ", error.code, error.message);
-        toast({
-          title: 'Sign In Failed',
-          description: `Error: ${error.message || 'Could not sign in with Google. Please try again.'} (Code: ${error.code || 'N/A'})`,
-          variant: 'destructive',
-        });
-      }
-    } finally {
-      setIsSigningIn(false);
+      console.error("Google Sign-In with redirect Error:", error);
+      toast({
+        title: 'Sign In Failed',
+        description: `Error: ${error.message || 'Could not sign in with Google. Please try again.'} (Code: ${error.code || 'N/A'})`,
+        variant: 'destructive',
+      });
+      setIsSigningIn(false); // Only set to false if an error occurs before redirect
     }
+    // setIsSigningIn(false) might not be reached if redirect is successful,
+    // as the page unloads. The loading state on the button is mostly for the initial click.
   };
 
   if (loading || (user && isAllowedUser)) {
@@ -104,11 +91,10 @@ export default function SignInPage() {
             ) : (
               <GoogleIcon />
             )}
-            {isSigningIn ? 'Signing In...' : 'Sign In with Google'}
+            {isSigningIn ? 'Redirecting...' : 'Sign In with Google'}
           </Button>
         </CardContent>
       </Card>
     </div>
   );
 }
-

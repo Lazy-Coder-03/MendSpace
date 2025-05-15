@@ -39,9 +39,11 @@ export default function SignInPage() {
       // The AuthProvider's onAuthStateChanged will handle redirection and access checks.
     } catch (error: any) {
       if (error.code === 'auth/popup-closed-by-user') {
-        // User closed the popup, this is not a system error.
-        // No toast needed, or a very mild, non-error one.
-        console.log("Google Sign-In: Popup closed by user.");
+        console.warn(
+          "Google Sign-In: Firebase reported 'auth/popup-closed-by-user'. " +
+          "This can happen if you manually closed the sign-in window, or sometimes due to browser extensions (like popup blockers), " +
+          "network issues, or other interference with the popup. If you did not close it, try disabling extensions or using an incognito window."
+        );
       } else {
         console.error("Google Sign-In Error: ", error);
         toast({
@@ -86,7 +88,7 @@ export default function SignInPage() {
         <CardContent>
           <Button 
             onClick={handleSignIn} 
-            className="w-full text-base py-6 shadow-lg" /* Gradient applied via variant="default" in button.tsx */
+            className="w-full text-base py-6 shadow-lg btn-primary-gradient" 
             variant="default"
             disabled={isSigningIn}
           >

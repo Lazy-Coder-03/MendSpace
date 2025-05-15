@@ -40,16 +40,33 @@ export default function SignInPage() {
       // After signInWithRedirect, the page will navigate away.
       // The user's state will be handled by onAuthStateChanged in FirebaseProvider upon return.
     } catch (error: any) {
-      console.error("Google Sign-In with redirect Error:", error);
-      toast({
-        title: 'Sign In Failed',
-        description: `Error: ${error.message || 'Could not sign in with Google. Please try again.'} (Code: ${error.code || 'N/A'})`,
-        variant: 'destructive',
-      });
-      setIsSigningIn(false); // Only set to false if an error occurs before redirect
+      if (error.code === 'auth/network-request-failed') {
+        console.error(
+          "Firebase Sign-In Error: Network request failed. This often indicates an issue with your internet connection, a firewall/proxy blocking Google's services, or a browser extension (like an ad blocker) interfering. Please check these and try again. Full error object:",
+          error
+        );
+        toast({
+          title: 'Sign In Failed: Network Issue',
+          description: `A network request failed. Please check your internet connection, firewall, or browser extensions. (Code: ${error.code})`,
+          variant: 'destructive',
+        });
+      } else if (error.code === 'auth/popup-closed-by-user') {
+        console.warn("Google Sign-In was cancelled by the user or an external factor (e.g., popup blocker). No error toast shown. Full error object:", error);
+        // User closed popup or it was blocked - often no toast is needed
+      } else if (error.code === 'auth/cancelled-popup-request') {
+         console.warn("Google Sign-In popup request was cancelled (e.g., multiple popups). No error toast shown. Full error object:", error);
+      } else {
+        console.error("Google Sign-In with redirect Error:", error);
+        toast({
+          title: 'Sign In Failed',
+          description: `Error: ${error.message || 'Could not sign in with Google. Please try again.'} (Code: ${error.code || 'N/A'})`,
+          variant: 'destructive',
+        });
+      }
+      setIsSigningIn(false); // Only set to false if an error occurs before redirect completes
     }
-    // setIsSigningIn(false) might not be reached if redirect is successful,
-    // as the page unloads. The loading state on the button is mostly for the initial click.
+    // Note: setIsSigningIn(false) might not be reached if redirect is successful,
+    // as the page unloads. The loading state on the button is mostly for the initial click phase.
   };
 
   if (loading || (user && isAllowedUser)) {

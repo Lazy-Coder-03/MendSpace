@@ -122,15 +122,17 @@
 
   /* Apply gradient background for light theme, solid for dark */
   html:not(.dark) body {
-    @apply bg-[linear-gradient(to_bottom_right,var(--gradient-start-color),var(--gradient-end-color))];
+    background-color: hsl(var(--background)); /* Base for gradient */
+    background-image: linear-gradient(to bottom right, var(--gradient-start-color), var(--gradient-end-color));
   }
   html.dark body {
-    @apply bg-background;
+    background-image: none; /* Ensure no gradient in dark mode */
+    background-color: hsl(var(--background)); /* Use the dark --background variable */
   }
 
 
   /* Add soft drop shadows to cards and buttons */
-  .card, .btn { 
+  .card, .btn { /* .btn is a general class for buttons if you use it elsewhere */
     @apply shadow-lg; 
   }
   

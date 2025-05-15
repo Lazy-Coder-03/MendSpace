@@ -67,13 +67,28 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
     }
   };
 
+  // Determine if the form is inside the blue dialog based on isEditing (a proxy for dialog context)
+  // This could be made more robust with a dedicated prop if needed.
+  const inDialog = isEditing; 
+
+  const labelClasses = inDialog ? "text-neutral-700" : "text-foreground/90";
+  const textInputClasses = inDialog 
+    ? "bg-white min-h-[100px] border-2 border-black text-black placeholder:text-neutral-500 focus-visible:ring-neutral-400" 
+    : "bg-input min-h-[100px]";
+  const signatureInputClasses = inDialog
+    ? "bg-neutral-100 cursor-not-allowed border-2 border-black text-black opacity-70 focus-visible:ring-neutral-400"
+    : "bg-muted/50 cursor-not-allowed";
+
+
   return (
-    <Card className="w-full shadow-xl bg-card/90 backdrop-blur-sm">
-      <CardHeader>
-        <CardTitle className="text-2xl text-primary">{isEditing ? 'Edit Submission' : 'New Submission'}</CardTitle>
-        <CardDescription className="text-muted-foreground">{isEditing ? 'Update your entry details below.' : 'Fill in the details for your new submission.'}</CardDescription>
-      </CardHeader>
-      <CardContent>
+    <Card className={`w-full shadow-xl ${inDialog ? 'bg-transparent border-0 shadow-none' : 'bg-card/90 backdrop-blur-sm'}`}>
+      {!inDialog && (
+        <CardHeader>
+          <CardTitle className="text-2xl text-primary">{isEditing ? 'Edit Submission' : 'New Submission'}</CardTitle>
+          <CardDescription className="text-muted-foreground">{isEditing ? 'Update your entry details below.' : 'Fill in the details for your new submission.'}</CardDescription>
+        </CardHeader>
+      )}
+      <CardContent className={inDialog ? 'p-0' : ''}>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
             <FormField
@@ -81,9 +96,9 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="field1"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground/90">{getField1LabelForm(user?.displayName)}</FormLabel>
+                  <FormLabel className={labelClasses}>{getField1LabelForm(user?.displayName)}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={getField1PlaceholderForm(user?.displayName)} {...field} className="bg-input min-h-[100px]"/>
+                    <Textarea placeholder={getField1PlaceholderForm(user?.displayName)} {...field} className={textInputClasses}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -94,9 +109,9 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="field2"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground/90">{getField2LabelForm()}</FormLabel>
+                  <FormLabel className={labelClasses}>{getField2LabelForm()}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={getField2PlaceholderForm()} {...field} className="bg-input min-h-[100px]"/>
+                    <Textarea placeholder={getField2PlaceholderForm()} {...field} className={textInputClasses}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -107,9 +122,9 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="field3"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground/90">{getField3LabelForm(user?.displayName)}</FormLabel>
+                  <FormLabel className={labelClasses}>{getField3LabelForm(user?.displayName)}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={getField3PlaceholderForm(user?.displayName)} {...field} className="bg-input min-h-[100px]"/>
+                    <Textarea placeholder={getField3PlaceholderForm(user?.displayName)} {...field} className={textInputClasses}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -120,21 +135,21 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="comments"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-foreground/90">{getCommentsLabelForm()}</FormLabel>
+                  <FormLabel className={labelClasses}>{getCommentsLabelForm()}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={getCommentsPlaceholderForm()} {...field} className="min-h-[100px] bg-input"/>
+                    <Textarea placeholder={getCommentsPlaceholderForm()} {...field} className={textInputClasses}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <FormItem>
-              <FormLabel className="text-foreground/90">Signature</FormLabel>
-              <Input value={user?.displayName || 'Loading...'} readOnly disabled className="bg-muted/50 cursor-not-allowed" />
+              <FormLabel className={labelClasses}>Signature</FormLabel>
+              <Input value={user?.displayName || 'Loading...'} readOnly disabled className={signatureInputClasses} />
             </FormItem>
             <Button 
               type="submit" 
-              variant="default" /* This will now apply the gradient */
+              variant="default" 
               className="w-full py-3 text-base shadow-lg" 
               disabled={isLoading}
             >
@@ -151,5 +166,3 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
     </Card>
   );
 }
-
-    

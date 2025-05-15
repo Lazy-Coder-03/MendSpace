@@ -46,7 +46,7 @@
     --sidebar-foreground: hsl(240, 10%, 20%);
     --sidebar-primary: hsl(210, 80%, 80%);
     --sidebar-primary-foreground: hsl(210, 25%, 10%);
-    --sidebar-accent: hsl(240, 67%, 96%); /* Kept slightly different from main accent for sidebar distinction if needed, or can be harmonized */
+    --sidebar-accent: hsl(240, 67%, 96%); 
     --sidebar-accent-foreground: hsl(240, 25%, 10%);
     --sidebar-border: hsl(220, 30%, 94%);
     --sidebar-ring: hsl(240, 70%, 85%);
@@ -81,7 +81,7 @@
     --chart-5: hsl(40, 60%, 60%);
 
     /* Sidebar Colors - Dark Theme */
-    --sidebar-background: hsl(240, 10%, 12%); /* Slightly lighter than main dark bg */
+    --sidebar-background: hsl(240, 10%, 12%); 
     --sidebar-foreground: hsl(220, 20%, 80%);
     --sidebar-primary: hsl(210, 60%, 55%);
     --sidebar-primary-foreground: hsl(210, 15%, 95%);
@@ -97,7 +97,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-gradient-to-br from-[hsl(330,100%,97%)] to-[hsl(210,100%,97%)] text-foreground min-h-screen;
+    @apply bg-background text-foreground min-h-screen; /* UPDATED: Use bg-background for light mode body */
     font-family: var(--font-poppins), sans-serif;
   }
 
@@ -106,8 +106,8 @@
   }
 
   /* Add soft drop shadows to cards and buttons */
-  .card, .btn { /* Assuming .btn is a common class for buttons or use ShadCN's Button component */
-    @apply shadow-lg; /* Softer shadow: shadow-md or shadow-lg */
+  .card, .btn { 
+    @apply shadow-lg; 
   }
   
   /* Smooth transitions for interactive elements */
@@ -116,6 +116,6 @@
   }
 
   button:hover, a:hover {
-    @apply transform scale-[1.03]; /* Subtle scale on hover */
+    @apply transform scale-[1.03]; 
   }
 }

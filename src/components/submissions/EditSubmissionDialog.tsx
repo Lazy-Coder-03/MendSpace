@@ -31,7 +31,7 @@ export function EditSubmissionDialog({ submission, isOpen, onOpenChange, onSave,
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-blue-200 border-border"> {/* Changed background to pastel blue */}
+      <DialogContent className="sm:max-w-[600px] bg-blue-200 border-border max-h-[85vh] overflow-y-auto"> {/* Changed background to pastel blue and made scrollable */}
         <DialogHeader>
           <DialogTitle className="text-black">Edit Submission</DialogTitle> {/* Black text for title */}
           <DialogDescription className="text-black"> {/* Black text for description */}
@@ -49,3 +49,4 @@ export function EditSubmissionDialog({ submission, isOpen, onOpenChange, onSave,
     </Dialog>
   );
 }
+

@@ -35,7 +35,7 @@ export default function SignInPage() {
   const handleSignIn = async () => {
     setIsSigningIn(true);
     try {
-      console.log("Attempting Google Sign-In with redirect...");
+      // console.log("Attempting Google Sign-In with redirect..."); // Removed this line
       await signInWithRedirect(auth, googleProvider);
       // After signInWithRedirect, the page will navigate away.
       // The user's state will be handled by onAuthStateChanged in FirebaseProvider upon return.
@@ -51,7 +51,7 @@ export default function SignInPage() {
           variant: 'destructive',
         });
       } else if (error.code === 'auth/popup-closed-by-user') {
-        console.warn("Google Sign-In was cancelled by the user or an external factor (e.g., popup blocker). No error toast shown. Full error object:", error);
+        console.warn("Google Sign-In was cancelled by the user or an external factor (e.g., popup blocker). This could also be due to Authorized Domain misconfiguration in Firebase project settings or browser extensions. Full error object:", error);
         // User closed popup or it was blocked - often no toast is needed
       } else if (error.code === 'auth/cancelled-popup-request') {
          console.warn("Google Sign-In popup request was cancelled (e.g., multiple popups). No error toast shown. Full error object:", error);

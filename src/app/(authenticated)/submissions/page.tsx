@@ -146,9 +146,9 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
             <TableHeader className="bg-muted/50">
               <TableRow>
                 <TableHead className="w-[50px] text-center border-r">#</TableHead>
-                <TableHead className="w-[25%] border-r">{getField1DisplayLabel(participantFirstName)}</TableHead>
-                <TableHead className="w-[25%] border-r">{getField2DisplayLabel(participantFirstName)}</TableHead>
-                <TableHead className="w-[25%] border-r">{getField3DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="border-r">{getField1DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="border-r">{getField2DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="border-r">{getField3DisplayLabel(participantFirstName)}</TableHead>
                 <TableHead className="border-r">{getCommentsDisplayLabel()}</TableHead>
                 <TableHead className="w-[180px]">Timestamp</TableHead>
               </TableRow>
@@ -181,7 +181,7 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
 export default function SubmissionsPage() {
   // Using only the first name for filtering
   const sayantanFirstName = "Sayantan";
-  const ashmiFirstName = "Ashmi"; // Assuming Ashmi's display name starts with "Ashmi"
+  const ashmiFirstName = "Ashmi"; 
 
   return (
     <div className="space-y-8">

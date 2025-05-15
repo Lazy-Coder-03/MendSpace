@@ -15,7 +15,6 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: 'Mendspace',
   description: 'A gentle space for your thoughts.',
-  // icons field removed as favicon.ico might not be present
 };
 
 export default function RootLayout({
@@ -24,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en"> {/* Removed suppressHydrationWarning */}
       <head />
       <body className={`${poppins.variable} font-sans antialiased`}>
         <QueryClientProviderWrapper>

@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { LogIn, Menu } from 'lucide-react'; 
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ThemeToggle } from './ThemeToggle';
+// import { ThemeToggle } from './ThemeToggle'; // Removed ThemeToggle
 import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet'; 
 import { Navigation } from './Navigation'; 
 
@@ -31,7 +31,10 @@ export function Header() {
                 <span className="sr-only">Open navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[280px] sm:w-[320px] p-0 bg-card">
+            <SheetContent 
+              side="left" 
+              className="w-[280px] sm:w-[320px] p-0 bg-card/90 backdrop-blur-md" // Added translucency and blur
+            >
               <SheetHeader className="p-4 pb-2 border-b">
                 <SheetTitle className="text-xl text-primary">Menu</SheetTitle>
               </SheetHeader>
@@ -52,7 +55,7 @@ export function Header() {
         </div>
         
         <div className="flex items-center gap-3 sm:gap-4">
-          <ThemeToggle />
+          {/* <ThemeToggle /> Removed ThemeToggle */}
           {!loading && (
             user ? <SignOutButton /> : (
               <Button asChild variant="outline" className="shadow-sm hover:shadow-md">

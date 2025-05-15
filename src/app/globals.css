@@ -58,57 +58,7 @@
     --sidebar-ring: hsl(210, 85%, 80%);
   }
 
-  .dark {
-    /* Dark Theme - Darkened Pastels with Brighter Text */
-    --background: hsl(230, 20%, 10%); /* Deep, dark, slightly desaturated blue */
-    --foreground: hsl(210, 30%, 92%); /* Bright, clear text */
-
-    --card: hsl(230, 18%, 14%); 
-    --card-foreground: hsl(210, 30%, 90%);
-
-    --popover: hsl(230, 18%, 14%);
-    --popover-foreground: hsl(210, 30%, 90%);
-
-    --primary: hsl(210, 80%, 68%); /* Darkened pastel blue, still vibrant */
-    --primary-foreground: hsl(210, 20%, 97%); /* Very bright text for primary elements */
-    
-    --secondary: hsl(330, 70%, 72%); /* Darkened pastel pink */
-    --secondary-foreground: hsl(330, 15%, 96%);
-
-    --muted: hsl(230, 15%, 22%); 
-    --muted-foreground: hsl(220, 15%, 70%);
-
-    --accent: hsl(270, 65%, 75%); /* Darkened pastel lavender */
-    --accent-foreground: hsl(270, 15%, 96%);
-    
-    --destructive: hsl(0, 65%, 58%); 
-    --destructive-foreground: hsl(0, 0%, 97%);
-
-    --border: hsl(230, 15%, 20%);
-    --input: hsl(230, 15%, 17%);
-    --ring: hsl(210, 80%, 70%);
-
-    /* Gradient Colors - Dark Theme (Darker, more subtle if used) */
-    --gradient-start-color: hsl(330, 55%, 55%); 
-    --gradient-end-color: hsl(210, 60%, 50%);   
-
-    /* Chart Colors - Dark Theme (Darkened pastels) */
-    --chart-1: hsl(210, 70%, 60%);
-    --chart-2: hsl(330, 60%, 65%);
-    --chart-3: hsl(270, 60%, 68%);
-    --chart-4: hsl(180, 50%, 60%);
-    --chart-5: hsl(40, 70%, 65%);
-
-    /* Sidebar Colors - Dark Theme (Consistent with main dark pastels) */
-    --sidebar-background: hsl(230, 18%, 12%); 
-    --sidebar-foreground: hsl(210, 25%, 88%);
-    --sidebar-primary: hsl(210, 75%, 65%);
-    --sidebar-primary-foreground: hsl(210, 15%, 96%);
-    --sidebar-accent: hsl(330, 60%, 70%);
-    --sidebar-accent-foreground: hsl(330, 15%, 96%);
-    --sidebar-border: hsl(230, 15%, 24%);
-    --sidebar-ring: hsl(210, 70%, 68%);
-  }
+  /* Removed .dark block */
 }
 
 @layer base {
@@ -118,18 +68,9 @@
   body {
     @apply text-foreground min-h-screen;
     font-family: var(--font-poppins), sans-serif;
-  }
-
-  /* Apply gradient background for light theme, solid for dark */
-  html:not(.dark) body {
     background-color: hsl(var(--background)); /* Base for gradient */
     background-image: linear-gradient(to bottom right, var(--gradient-start-color), var(--gradient-end-color));
   }
-  html.dark body {
-    background-image: none; /* Ensure no gradient in dark mode */
-    background-color: hsl(var(--background)); /* Use the dark --background variable */
-  }
-
 
   /* Add soft drop shadows to cards and buttons */
   .card, .btn { /* .btn is a general class for buttons if you use it elsewhere */
@@ -144,8 +85,4 @@
   button:hover, a:hover {
     @apply transform scale-[1.02]; /* Slightly more subtle hover scale */
   }
-
-  /* Specific gradient for main action buttons - applied in button.tsx */
-  /* .btn-primary-gradient class is effectively handled by the default button variant now */
-
 }

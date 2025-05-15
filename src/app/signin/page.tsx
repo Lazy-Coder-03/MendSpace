@@ -35,20 +35,28 @@ export default function SignInPage() {
   const handleSignIn = async () => {
     setIsSigningIn(true);
     try {
-      await signInWithPopup(auth, googleProvider);
+      console.log("Attempting Google Sign-In...");
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log("Google Sign-In successful for user:", result.user?.displayName, "(UID:", result.user?.uid, ")");
       // The AuthProvider's onAuthStateChanged will handle redirection and access checks.
     } catch (error: any) {
+      console.error("Google Sign-In Error Raw:", error); 
       if (error.code === 'auth/popup-closed-by-user') {
         console.warn(
           "Google Sign-In: Firebase reported 'auth/popup-closed-by-user'. " +
-          "This can happen if you manually closed the sign-in window, or sometimes due to browser extensions (like popup blockers), " +
-          "network issues, or other interference with the popup. If you did not close it, try disabling extensions or using an incognito window."
+          "This can happen if you manually closed the sign-in window, or more likely due to: \n" +
+          "1. Browser extensions (like popup blockers or privacy tools).\n" +
+          "2. Network issues or firewalls.\n" +
+          "3. CRITICAL: Your Firebase project's 'Authorized Domains' list in the Firebase Console (Authentication -> Sign-in method) might not include the domain you are running this app from.\n" +
+          "4. Other interference with the popup.\n" +
+          "If you did not close it, please check your Firebase project's 'Authorized Domains' list first. Then, try disabling browser extensions or using an incognito window."
         );
+        // No toast for this specific error, as it's often not a direct user fault or code bug.
       } else {
-        console.error("Google Sign-In Error: ", error);
+        console.error("Google Sign-In Error Processed: ", error.code, error.message);
         toast({
           title: 'Sign In Failed',
-          description: error.message || 'Could not sign in with Google. Please try again.',
+          description: `Error: ${error.message || 'Could not sign in with Google. Please try again.'} (Code: ${error.code || 'N/A'})`,
           variant: 'destructive',
         });
       }
@@ -66,7 +74,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 bg-background"> {/* Use bg-background for theme consistency */}
+    <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-[var(--gradient-start-color)] to-[var(--gradient-end-color)]">
       <Card className="w-full max-w-md shadow-xl bg-card/90 backdrop-blur-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-6">
@@ -77,10 +85,10 @@ export default function SignInPage() {
               height={150} 
               className="rounded-md" 
               priority
-              data-ai-hint="company logo monogram M" 
+              data-ai-hint="company logo monogram M"
             />
           </div>
-          <CardTitle className="text-3xl font-bold text-primary">Welcome to Mendspace</CardTitle> {/* Uses theme primary color */}
+          <CardTitle className="text-3xl font-bold text-primary">Welcome to Mendspace</CardTitle>
           <CardDescription className="text-muted-foreground pt-2">
             Please sign in with Google to continue. Access is restricted.
           </CardDescription>
@@ -104,3 +112,4 @@ export default function SignInPage() {
     </div>
   );
 }
+

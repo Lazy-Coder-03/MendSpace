@@ -139,11 +139,12 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
     } finally {
       setIsLoading(false);
     }
-  }, [participantSignature, lastVisibleDoc, firstVisibleDoc, currentPage]);
+  }, [participantSignature, lastVisibleDoc, firstVisibleDoc, currentPage]); // Added currentPage to dependency array
 
   useEffect(() => {
     fetchSubmissions('initial');
-  }, [fetchSubmissions]); // Ensure useCallback dependencies are correct
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [participantSignature]); // Only participantSignature, fetchSubmissions will be stable due to useCallback
 
 
   if (isLoading && submissions.length === 0) {
@@ -195,6 +196,7 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
+                <TableHead className="w-[50px] text-center">#</TableHead>
                 <TableHead className="w-[200px] min-w-[150px]">{getField1DisplayLabel(participantSignature)}</TableHead>
                 <TableHead className="w-[200px] min-w-[150px]">{getField2DisplayLabel(participantSignature)}</TableHead>
                 <TableHead className="w-[200px] min-w-[150px]">{getField3DisplayLabel(participantSignature)}</TableHead>
@@ -204,8 +206,9 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
               </TableRow>
             </TableHeader>
             <TableBody>
-              {submissions.map((sub) => (
+              {submissions.map((sub, index) => (
                 <TableRow key={sub.id} className="hover:bg-accent/50">
+                  <TableCell className="text-center font-medium">{index + 1}</TableCell>
                   <TableCell className="font-medium truncate max-w-xs">{sub.field1}</TableCell>
                   <TableCell className="truncate max-w-xs">{sub.field2}</TableCell>
                   <TableCell className="truncate max-w-xs">{sub.field3}</TableCell>
@@ -239,3 +242,6 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
     </Card>
   );
 }
+
+
+    

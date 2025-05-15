@@ -15,11 +15,7 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: 'Mendspace',
   description: 'A gentle space for your thoughts.',
-  // Adding an icon link for the new logo. Make sure logo.png is in /public
-  icons: {
-    icon: '/favicon.ico',
-
-  }
+  // icons field removed as favicon.ico might not be present
 };
 
 export default function RootLayout({

@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect } from 'react';
@@ -36,7 +37,6 @@ export default function SignInPage() {
     try {
       await signInWithPopup(auth, googleProvider);
       // The AuthProvider's onAuthStateChanged will handle redirection and access checks.
-      // Toast for successful sign-in will be handled by AuthProvider or here if needed after verification.
     } catch (error: any) {
       console.error("Google Sign-In Error: ", error);
       toast({
@@ -58,11 +58,19 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4">
+    <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-[hsl(330,100%,97%)] to-[hsl(210,100%,97%)] dark:bg-background">
       <Card className="w-full max-w-md shadow-xl bg-card/90 backdrop-blur-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4">
-            <Image src="https://placehold.co/100x100.png" alt="Mendspace Logo" width={100} height={100} className="rounded-full" data-ai-hint="abstract logo" />
+          <div className="mx-auto mb-6">
+            <Image 
+              src="/logo.png" 
+              alt="Mendspace Logo" 
+              width={185} // Approx 1.5 * 123 (original estimate for 100px height)
+              height={150} // Approx 1.5 * 98
+              className="rounded-md" 
+              priority
+              data-ai-hint="company logo monogram M" 
+            />
           </div>
           <CardTitle className="text-3xl font-bold text-primary">Welcome to Mendspace</CardTitle>
           <CardDescription className="text-muted-foreground pt-2">

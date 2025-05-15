@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Poppins } from 'next/font/google';
 import './globals.css';
@@ -14,6 +15,10 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: 'Mendspace',
   description: 'A gentle space for your thoughts.',
+  // Adding an icon link for the new logo. Make sure logo.png is in /public
+  icons: {
+    icon: '/logo.png', 
+  }
 };
 
 export default function RootLayout({
@@ -22,7 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head />
       <body className={`${poppins.variable} font-sans antialiased`}>
         <QueryClientProviderWrapper>
           <FirebaseProvider>

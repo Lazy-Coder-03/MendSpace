@@ -52,11 +52,12 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
     setIsLoading(true);
     setError(null);
     try {
+      // Query for signatures that start with the participantFirstName
       const q = query(
         collection(db, 'submissions'),
         where('signature', '>=', participantFirstName),
-        where('signature', '<=', participantFirstName + '\uf8ff'),
-        orderBy('signature', 'asc'), 
+        where('signature', '<=', participantFirstName + '\uf8ff'), // \uf8ff is a very high code point in Unicode
+        orderBy('signature', 'asc'), // Necessary for the range filter on signature
         orderBy('createdAt', 'desc'),
         limit(SUBMISSIONS_TO_SHOW)
       );
@@ -66,6 +67,7 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
     } catch (err: any) {
       console.error(`Error fetching submissions for ${participantFirstName}: `, err);
       let detailedError = `Failed to load submissions. Please try again. ${err.message}`;
+      // Enhanced error message for missing index
       if (err.code === 'failed-precondition' && err.message.includes('index')) {
         const match = err.message.match(/(https:\/\/console\.firebase\.google\.com\/[^"]+)/);
         if (match && match[1]) {
@@ -73,7 +75,7 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
         }
       }
       setError(detailedError);
-      setSubmissions([]);
+      setSubmissions([]); // Clear submissions on error
     } finally {
       setIsLoading(false);
     }
@@ -139,16 +141,16 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
         <CardTitle className="text-2xl text-primary">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto rounded-md border">
+        <div className="overflow-x-auto rounded-md border"> {/* This div allows horizontal scroll if content is still too wide */}
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
                 <TableHead className="w-[50px] text-center border-r">#</TableHead>
-                <TableHead className="w-[25%] min-w-[150px] border-r">{getField1DisplayLabel(participantFirstName)}</TableHead>
-                <TableHead className="w-[25%] min-w-[150px] border-r">{getField2DisplayLabel(participantFirstName)}</TableHead>
-                <TableHead className="w-[25%] min-w-[150px] border-r">{getField3DisplayLabel(participantFirstName)}</TableHead>
-                <TableHead className="min-w-[200px] border-r">{getCommentsDisplayLabel()}</TableHead>
-                <TableHead className="w-[200px] min-w-[180px]">Timestamp</TableHead>
+                <TableHead className="w-[25%] border-r">{getField1DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="w-[25%] border-r">{getField2DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="w-[25%] border-r">{getField3DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="border-r">{getCommentsDisplayLabel()}</TableHead>
+                <TableHead className="w-[180px]">Timestamp</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -159,7 +161,7 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
                   <TableCell className="whitespace-pre-wrap break-words border-r">{sub.field2 || 'N/A'}</TableCell>
                   <TableCell className="whitespace-pre-wrap break-words border-r">{sub.field3 || 'N/A'}</TableCell>
                   <TableCell className="whitespace-pre-wrap break-words border-r">{sub.comments || 'N/A'}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{formatTimestamp(sub.createdAt)}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground whitespace-pre-wrap break-words">{formatTimestamp(sub.createdAt)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -177,8 +179,9 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
 
 
 export default function SubmissionsPage() {
+  // Using only the first name for filtering
   const sayantanFirstName = "Sayantan";
-  const ashmiFirstName = "Ashmi";
+  const ashmiFirstName = "Ashmi"; // Assuming Ashmi's display name starts with "Ashmi"
 
   return (
     <div className="space-y-8">

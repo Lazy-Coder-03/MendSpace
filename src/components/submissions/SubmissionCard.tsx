@@ -73,7 +73,11 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
         ...data,
         updatedAt: serverTimestamp() as any,
       });
-      toast({ title: 'Success', description: 'Submission updated successfully.' });
+      toast({ 
+        title: 'Success', 
+        description: 'Submission updated successfully.',
+        className: 'bg-green-100 border-green-400 text-green-700',
+      });
       setIsEditDialogOpen(false);
       onSubmissionUpdate(); 
     } catch (error) {
@@ -88,7 +92,11 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
     setIsDeleting(true);
     try {
       await deleteDoc(doc(db, 'submissions', submission.id));
-      toast({ title: 'Success', description: 'Submission removed successfully.' });
+      toast({ 
+        title: 'Success', 
+        description: 'Submission removed successfully.',
+        className: 'bg-green-100 border-green-400 text-green-700',
+      });
       onSubmissionUpdate(); // Refresh the list
       // AlertDialog will close itself via its cancel/action buttons or onOpenChange
     } catch (error) {

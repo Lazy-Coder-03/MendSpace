@@ -17,7 +17,8 @@ export const metadata: Metadata = {
   description: 'A gentle space for your thoughts.',
   // Adding an icon link for the new logo. Make sure logo.png is in /public
   icons: {
-    icon: '/logo.png', 
+    icon: '/favicon.ico',
+
   }
 };
 

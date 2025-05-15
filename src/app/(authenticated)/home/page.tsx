@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -32,7 +33,7 @@ export default function HomePage() {
       toast({
         title: 'Submission Successful!',
         description: 'Your entry has been saved.',
-        className: 'bg-green-100 border-green-400 text-green-700', // Example of custom styling for success
+        className: 'bg-green-100 border-green-400 text-green-700', 
       });
     } catch (error) {
       console.error('Error adding document: ', error);
@@ -43,7 +44,7 @@ export default function HomePage() {
   };
   
   if (!user) {
-    return ( // This should ideally be handled by AuthGuard, but as a fallback
+    return ( 
       <Card className="m-auto mt-10 max-w-lg">
         <CardHeader>
           <CardTitle>Access Denied</CardTitle>
@@ -55,8 +56,8 @@ export default function HomePage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center text-gray-700 dark:text-gray-300">
-            Welcome, <span className="text-primary">{user.displayName}</span>!
+        <h1 className="text-4xl font-bold mb-8 text-center text-primary">
+            Welcome, <span className="font-semibold">{user.displayName}</span>!
         </h1>
         <p className="text-lg text-muted-foreground mb-10 text-center">
             Ready to share something new? Fill out the form below.
@@ -65,3 +66,5 @@ export default function HomePage() {
     </div>
   );
 }
+
+    

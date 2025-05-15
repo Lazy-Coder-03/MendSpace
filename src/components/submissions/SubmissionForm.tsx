@@ -71,7 +71,7 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
     <Card className="w-full shadow-xl bg-card/90 backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="text-2xl text-primary">{isEditing ? 'Edit Submission' : 'New Submission'}</CardTitle>
-        <CardDescription>{isEditing ? 'Update your entry details below.' : 'Fill in the details for your new submission.'}</CardDescription>
+        <CardDescription className="text-muted-foreground">{isEditing ? 'Update your entry details below.' : 'Fill in the details for your new submission.'}</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -81,9 +81,9 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="field1"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{getField1LabelForm(user?.displayName)}</FormLabel>
+                  <FormLabel className="text-foreground/90">{getField1LabelForm(user?.displayName)}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={getField1PlaceholderForm(user?.displayName)} {...field} className="bg-background/70 min-h-[100px]"/>
+                    <Textarea placeholder={getField1PlaceholderForm(user?.displayName)} {...field} className="bg-input min-h-[100px]"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -94,9 +94,9 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="field2"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{getField2LabelForm()}</FormLabel>
+                  <FormLabel className="text-foreground/90">{getField2LabelForm()}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={getField2PlaceholderForm()} {...field} className="bg-background/70 min-h-[100px]"/>
+                    <Textarea placeholder={getField2PlaceholderForm()} {...field} className="bg-input min-h-[100px]"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -107,9 +107,9 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="field3"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{getField3LabelForm(user?.displayName)}</FormLabel>
+                  <FormLabel className="text-foreground/90">{getField3LabelForm(user?.displayName)}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={getField3PlaceholderForm(user?.displayName)} {...field} className="bg-background/70 min-h-[100px]"/>
+                    <Textarea placeholder={getField3PlaceholderForm(user?.displayName)} {...field} className="bg-input min-h-[100px]"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -120,19 +120,24 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="comments"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{getCommentsLabelForm()}</FormLabel>
+                  <FormLabel className="text-foreground/90">{getCommentsLabelForm()}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={getCommentsPlaceholderForm()} {...field} className="min-h-[100px] bg-background/70"/>
+                    <Textarea placeholder={getCommentsPlaceholderForm()} {...field} className="min-h-[100px] bg-input"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
             <FormItem>
-              <FormLabel>Signature</FormLabel>
+              <FormLabel className="text-foreground/90">Signature</FormLabel>
               <Input value={user?.displayName || 'Loading...'} readOnly disabled className="bg-muted/50 cursor-not-allowed" />
             </FormItem>
-            <Button type="submit" className="w-full py-3 text-base bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-lg" disabled={isLoading}>
+            <Button 
+              type="submit" 
+              variant="default" /* This will now apply the gradient */
+              className="w-full py-3 text-base shadow-lg" 
+              disabled={isLoading}
+            >
               {isLoading ? (
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               ) : (
@@ -146,3 +151,5 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
     </Card>
   );
 }
+
+    

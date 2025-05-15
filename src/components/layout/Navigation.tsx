@@ -1,9 +1,10 @@
+
 "use client";
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Home, ListChecks, History, Edit3 } from 'lucide-react'; // Edit3 for Submissions icon
+import { Home, ListChecks, History, Edit3 } from 'lucide-react'; 
 
 const navItems = [
   { href: '/home', label: 'Home', icon: Home },
@@ -25,7 +26,9 @@ export function Navigation() {
                 href={item.href}
                 className={cn(
                   'flex items-center space-x-3 px-4 py-3 rounded-md hover:bg-accent hover:text-accent-foreground transition-all duration-200 ease-in-out group',
-                  isActive ? 'bg-primary text-primary-foreground shadow-inner font-medium' : 'text-foreground/80 hover:shadow-sm'
+                  isActive 
+                    ? 'bg-[linear-gradient(to_right,var(--gradient-start-color),var(--gradient-end-color))] text-primary-foreground shadow-inner font-medium' 
+                    : 'text-foreground/80 hover:shadow-sm'
                 )}
               >
                 <item.icon className={cn('h-5 w-5 transition-transform duration-300 group-hover:scale-110', isActive ? 'text-primary-foreground' : 'text-primary')} />
@@ -38,3 +41,5 @@ export function Navigation() {
     </nav>
   );
 }
+
+    

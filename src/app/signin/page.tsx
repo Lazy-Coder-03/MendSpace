@@ -58,21 +58,21 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-[hsl(330,100%,97%)] to-[hsl(210,100%,97%)] dark:bg-background">
+    <div className="flex items-center justify-center min-h-screen p-4 bg-background"> {/* Use bg-background for theme consistency */}
       <Card className="w-full max-w-md shadow-xl bg-card/90 backdrop-blur-sm">
         <CardHeader className="text-center">
           <div className="mx-auto mb-6">
             <Image 
               src="/logo.png" 
               alt="Mendspace Logo" 
-              width={185} // Approx 1.5 * 123 (original estimate for 100px height)
-              height={150} // Approx 1.5 * 98
+              width={185} 
+              height={150} 
               className="rounded-md" 
               priority
               data-ai-hint="company logo monogram M" 
             />
           </div>
-          <CardTitle className="text-3xl font-bold text-primary">Welcome to Mendspace</CardTitle>
+          <CardTitle className="text-3xl font-bold text-primary">Welcome to Mendspace</CardTitle> {/* Uses theme primary color */}
           <CardDescription className="text-muted-foreground pt-2">
             Please sign in with Google to continue. Access is restricted.
           </CardDescription>
@@ -80,7 +80,8 @@ export default function SignInPage() {
         <CardContent>
           <Button 
             onClick={handleSignIn} 
-            className="w-full text-base py-6 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground shadow-lg" 
+            className="w-full text-base py-6 shadow-lg" /* Gradient applied via variant="default" in button.tsx */
+            variant="default"
             disabled={isSigningIn}
           >
             {isSigningIn ? (
@@ -95,3 +96,5 @@ export default function SignInPage() {
     </div>
   );
 }
+
+    

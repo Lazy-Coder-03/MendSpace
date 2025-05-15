@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import type { Submission, EditableSubmissionFields } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button'; // Added buttonVariants import
 import { useAuth } from '@/hooks/useAuth';
 import { EditSubmissionDialog } from './EditSubmissionDialog';
 import { Timestamp as FirestoreTimestamp, doc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
@@ -168,3 +168,4 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
     </>
   );
 }
+

@@ -23,7 +23,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en"> {/* Removed suppressHydrationWarning */}
+    <html lang="en">
       <head />
       <body className={`${poppins.variable} font-sans antialiased`}>
         <QueryClientProviderWrapper>

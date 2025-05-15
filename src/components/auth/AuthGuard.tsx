@@ -5,6 +5,10 @@ import { useRouter, usePathname } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
+// Note: Next.js sometimes issues console warnings related to "params" or "searchParams"
+// enumeration when routing hooks are used in Client Components during SSR.
+// These are often framework-level warnings and may not indicate a direct error in this component.
+
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading, isAllowedUser } = useAuth();
   const router = useRouter();

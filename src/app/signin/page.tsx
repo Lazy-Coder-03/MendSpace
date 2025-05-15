@@ -3,7 +3,7 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithRedirect } from 'firebase/auth';
+import { signInWithPopup } from 'firebase/auth'; // Changed from signInWithRedirect
 import { auth, googleProvider } from '@/firebase/config';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -35,10 +35,9 @@ export default function SignInPage() {
   const handleSignIn = async () => {
     setIsSigningIn(true);
     try {
-      // console.log("Attempting Google Sign-In with redirect..."); // Removed this line
-      await signInWithRedirect(auth, googleProvider);
-      // After signInWithRedirect, the page will navigate away.
-      // The user's state will be handled by onAuthStateChanged in FirebaseProvider upon return.
+      await signInWithPopup(auth, googleProvider); // Changed to signInWithPopup
+      // After signInWithPopup resolves, onAuthStateChanged in FirebaseProvider
+      // will handle the user state and potential redirect to /home.
     } catch (error: any) {
       if (error.code === 'auth/network-request-failed') {
         console.error(
@@ -52,21 +51,20 @@ export default function SignInPage() {
         });
       } else if (error.code === 'auth/popup-closed-by-user') {
         console.warn("Google Sign-In was cancelled by the user or an external factor (e.g., popup blocker). This could also be due to Authorized Domain misconfiguration in Firebase project settings or browser extensions. Full error object:", error);
-        // User closed popup or it was blocked - often no toast is needed
+        // User closed popup or it was blocked - often no toast is needed for this specific case.
       } else if (error.code === 'auth/cancelled-popup-request') {
          console.warn("Google Sign-In popup request was cancelled (e.g., multiple popups). No error toast shown. Full error object:", error);
       } else {
-        console.error("Google Sign-In with redirect Error:", error);
+        console.error("Google Sign-In with popup Error:", error);
         toast({
           title: 'Sign In Failed',
           description: `Error: ${error.message || 'Could not sign in with Google. Please try again.'} (Code: ${error.code || 'N/A'})`,
           variant: 'destructive',
         });
       }
-      setIsSigningIn(false); // Only set to false if an error occurs before redirect completes
+    } finally {
+      setIsSigningIn(false);
     }
-    // Note: setIsSigningIn(false) might not be reached if redirect is successful,
-    // as the page unloads. The loading state on the button is mostly for the initial click phase.
   };
 
   if (loading || (user && isAllowedUser)) {
@@ -108,7 +106,7 @@ export default function SignInPage() {
             ) : (
               <GoogleIcon />
             )}
-            {isSigningIn ? 'Redirecting...' : 'Sign In with Google'}
+            {isSigningIn ? 'Opening Google Sign-In...' : 'Sign In with Google'}
           </Button>
         </CardContent>
       </Card>

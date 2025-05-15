@@ -9,7 +9,7 @@ import { LogIn, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { ThemeToggle } from './ThemeToggle';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet'; 
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet'; 
 import { Navigation } from './Navigation'; 
 
 export function Header() {
@@ -26,13 +26,15 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
-              {/* Removed md:hidden to make hamburger menu always visible */}
               <Button variant="outline" size="icon" className="mr-2"> 
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">Open navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[280px] sm:w-[320px] p-0 pt-8 bg-card">
+            <SheetContent side="left" className="w-[280px] sm:w-[320px] p-0 bg-card">
+              <SheetHeader className="p-4 pb-2 border-b">
+                <SheetTitle className="text-xl text-primary">Menu</SheetTitle>
+              </SheetHeader>
               <div className="p-4">
                  <Link href="/home" className="flex items-center gap-2 text-2xl font-bold text-primary hover:text-primary/80 transition-colors mb-6" onClick={handleLinkClick}>
                     <Image src="/logo.png" alt="Mendspace Logo" width={40} height={32} priority data-ai-hint="monogram letter M" />

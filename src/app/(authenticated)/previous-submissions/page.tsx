@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { collection, query, orderBy, limit, startAfter, getDocs, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import type { Submission } from '@/lib/types';
 import { SubmissionCard } from '@/components/submissions/SubmissionCard';
@@ -10,64 +10,42 @@ import { useAuth } from '@/hooks/useAuth';
 import { Loader2, Inbox, AlertCircle, Search } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-
-const SUBMISSIONS_PER_PAGE = 5; // Number of submissions to load per batch
+// Removed Button as Load More is not used
 
 export default function PreviousSubmissionsPage() {
   const { user } = useAuth();
   const [allSubmissions, setAllSubmissions] = useState<Submission[]>([]);
   const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [lastVisibleDoc, setLastVisibleDoc] = useState<QueryDocumentSnapshot<DocumentData> | null>(null);
-  const [hasMore, setHasMore] = useState(true);
 
-  const fetchSubmissionsBatch = useCallback(async (startAfterDoc: QueryDocumentSnapshot<DocumentData> | null = null) => {
-    if (startAfterDoc === null) setIsLoading(true); // Full load
-    else setIsLoadingMore(true); // Loading more
-
+  const fetchAllSubmissions = useCallback(async () => {
+    setIsLoading(true);
     setError(null);
 
     try {
-      let q = query(
+      const q = query(
         collection(db, 'submissions'), 
-        orderBy('createdAt', 'desc'), 
-        limit(SUBMISSIONS_PER_PAGE)
+        orderBy('createdAt', 'desc')
       );
 
-      if (startAfterDoc) {
-        q = query(
-          collection(db, 'submissions'), 
-          orderBy('createdAt', 'desc'), 
-          startAfter(startAfterDoc), 
-          limit(SUBMISSIONS_PER_PAGE)
-        );
-      }
-
       const querySnapshot = await getDocs(q);
-      const newSubs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Submission));
+      const fetchedSubs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Submission));
       
-      setAllSubmissions(prevSubs => startAfterDoc ? [...prevSubs, ...newSubs] : newSubs);
+      setAllSubmissions(fetchedSubs);
       
-      const lastDocInBatch = querySnapshot.docs[querySnapshot.docs.length - 1];
-      setLastVisibleDoc(lastDocInBatch || null);
-      setHasMore(newSubs.length === SUBMISSIONS_PER_PAGE);
-
     } catch (err) {
       console.error("Error fetching submissions: ", err);
       setError("Failed to load submissions. Please try again later.");
     } finally {
       setIsLoading(false);
-      setIsLoadingMore(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchSubmissionsBatch(); // Initial fetch
-  }, [fetchSubmissionsBatch]);
+    fetchAllSubmissions(); // Initial fetch of all submissions
+  }, [fetchAllSubmissions]);
 
   useEffect(() => {
     const lowerSearchTerm = searchTerm.toLowerCase();
@@ -81,27 +59,18 @@ export default function PreviousSubmissionsPage() {
     );
     setFilteredSubmissions(filtered);
   }, [searchTerm, allSubmissions]);
-
-  const handleLoadMore = () => {
-    if (lastVisibleDoc && hasMore) {
-      fetchSubmissionsBatch(lastVisibleDoc);
-    }
-  };
   
   const handleSubmissionUpdate = () => {
     // For now, a full refresh might be needed to see updates immediately with getDocs
-    // Or, we could implement a more sophisticated update in place
     setAllSubmissions([]); // Clear current submissions
-    setLastVisibleDoc(null); // Reset pagination
-    setHasMore(true);
-    fetchSubmissionsBatch(); // Refetch
+    fetchAllSubmissions(); // Refetch all
   };
 
-  if (isLoading && allSubmissions.length === 0) { // Show initial loader only if no data yet
+  if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
-        <p className="mt-4 text-lg text-muted-foreground">Loading previous entries...</p>
+        <p className="mt-4 text-lg text-muted-foreground">Loading all previous entries...</p>
       </div>
     );
   }
@@ -131,17 +100,16 @@ export default function PreviousSubmissionsPage() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-3xl font-bold mb-2 text-gray-700 dark:text-gray-300">Previous Entries</h1>
+        <h1 className="text-3xl font-bold mb-2 text-gray-700 dark:text-gray-300">All Previous Entries</h1>
         <p className="text-muted-foreground">
-          Browse through past entries. {userIsAdmin ? "You can edit your own." : "Entries are view-only for you."}
-          {searchTerm && " (Search results are from currently loaded entries)"}
+          Browse through all past entries. {userIsAdmin ? "You can edit your own." : "Entries are view-only for you."}
         </p>
       </div>
 
       <div className="relative mb-6">
         <Input 
           type="text"
-          placeholder="Search loaded entries by statements, feelings, defences, comments, or signature..."
+          placeholder="Search all entries by statements, feelings, defences, comments, or signature..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 py-3 text-base bg-card border-border/70 focus:border-primary focus:ring-primary"
@@ -154,7 +122,7 @@ export default function PreviousSubmissionsPage() {
             <Inbox className="h-5 w-5 text-primary" />
             <AlertTitle className="text-primary/90">No Entries Yet</AlertTitle>
             <AlertDescription className="text-foreground/70">
-              {searchTerm ? `No submissions match your search criteria "${searchTerm}" among the loaded entries.` : "There are no submissions to display at the moment."}
+              {searchTerm ? `No submissions match your search criteria "${searchTerm}".` : "There are no submissions to display at the moment."}
             </AlertDescription>
         </Alert>
       )}
@@ -170,18 +138,8 @@ export default function PreviousSubmissionsPage() {
         </div>
       ))}
 
-      {hasMore && !isLoading && (
-        <div className="text-center mt-10">
-          <Button onClick={handleLoadMore} disabled={isLoadingMore} variant="outline" className="shadow-md hover:shadow-lg">
-            {isLoadingMore ? (
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-            ) : null}
-            {isLoadingMore ? 'Loading...' : 'Load More Entries'}
-          </Button>
-        </div>
-      )}
-      {!hasMore && allSubmissions.length > 0 && (
-        <p className="text-center text-muted-foreground mt-10">You've reached the end of the entries.</p>
+      {allSubmissions.length > 0 && (
+        <p className="text-center text-muted-foreground mt-10">You are viewing all entries.</p>
       )}
     </div>
   );

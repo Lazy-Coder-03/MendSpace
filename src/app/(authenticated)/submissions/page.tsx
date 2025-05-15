@@ -56,7 +56,7 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
         collection(db, 'submissions'),
         where('signature', '>=', participantFirstName),
         where('signature', '<=', participantFirstName + '\uf8ff'),
-        orderBy('signature', 'asc'), // Required for range filter on signature
+        orderBy('signature', 'asc'), 
         orderBy('createdAt', 'desc'),
         limit(SUBMISSIONS_TO_SHOW)
       );
@@ -143,24 +143,22 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead className="w-[50px] text-center">#</TableHead>
-                <TableHead className="w-[200px] min-w-[150px]">{getField1DisplayLabel(participantFirstName)}</TableHead>
-                <TableHead className="w-[200px] min-w-[150px]">{getField2DisplayLabel(participantFirstName)}</TableHead>
-                <TableHead className="w-[200px] min-w-[150px]">{getField3DisplayLabel(participantFirstName)}</TableHead>
-                <TableHead className="min-w-[200px]">{getCommentsDisplayLabel()}</TableHead>
-                <TableHead className="w-[150px] min-w-[120px]">Full Signature</TableHead>
+                <TableHead className="w-[50px] text-center border-r">#</TableHead>
+                <TableHead className="w-[25%] min-w-[150px] border-r">{getField1DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="w-[25%] min-w-[150px] border-r">{getField2DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="w-[25%] min-w-[150px] border-r">{getField3DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="min-w-[200px] border-r">{getCommentsDisplayLabel()}</TableHead>
                 <TableHead className="w-[200px] min-w-[180px]">Timestamp</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {submissions.map((sub, index) => (
                 <TableRow key={sub.id} className="hover:bg-accent/50">
-                  <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                  <TableCell className="font-medium truncate max-w-xs">{sub.field1 || 'N/A'}</TableCell>
-                  <TableCell className="truncate max-w-xs">{sub.field2 || 'N/A'}</TableCell>
-                  <TableCell className="truncate max-w-xs">{sub.field3 || 'N/A'}</TableCell>
-                  <TableCell className="truncate max-w-md">{sub.comments || 'N/A'}</TableCell>
-                  <TableCell className="text-muted-foreground">{sub.signature || 'N/A'}</TableCell>
+                  <TableCell className="text-center font-medium border-r">{index + 1}</TableCell>
+                  <TableCell className="font-medium whitespace-pre-wrap break-words border-r">{sub.field1 || 'N/A'}</TableCell>
+                  <TableCell className="whitespace-pre-wrap break-words border-r">{sub.field2 || 'N/A'}</TableCell>
+                  <TableCell className="whitespace-pre-wrap break-words border-r">{sub.field3 || 'N/A'}</TableCell>
+                  <TableCell className="whitespace-pre-wrap break-words border-r">{sub.comments || 'N/A'}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{formatTimestamp(sub.createdAt)}</TableCell>
                 </TableRow>
               ))}
@@ -203,3 +201,4 @@ export default function SubmissionsPage() {
     </div>
   );
 }
+

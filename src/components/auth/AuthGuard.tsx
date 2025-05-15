@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useAuth } from '@/hooks/useAuth';
@@ -12,37 +13,42 @@ import { Loader2 } from 'lucide-react';
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading, isAllowedUser } = useAuth();
   const router = useRouter();
-  const pathname = usePathname();
+  // const pathname = usePathname(); // pathname is not directly used for redirect logic here, can be removed if not needed for other purposes
 
   useEffect(() => {
+    // Only perform actions once the loading state from Firebase is resolved
     if (!loading) {
       if (!user || !isAllowedUser) {
-        // Store the intended path to redirect after successful login
-        if (pathname !== '/signin') {
-           // No need to store redirectPath, Firebase handles session persistence.
-           // If user directly lands on protected page, after sign in, they might need manual navigation or a smart redirect from home.
-        }
+        // If user is not logged in, or not an allowed user,
+        // redirect them to the sign-in page.
         router.push('/signin');
       }
+      // If user IS logged in and IS allowed, this effect does nothing,
+      // and the component will proceed to render 'children'.
     }
-  }, [user, loading, isAllowedUser, router, pathname]);
+  }, [user, loading, isAllowedUser, router]);
 
-  if (loading || (!user && pathname !== '/signin')) {
+  if (loading) {
+    // While the authentication state is being determined, show a loader.
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
     );
   }
-  
+
   if (!user || !isAllowedUser) {
-    // This case should ideally be covered by the redirect, but as a fallback:
+    // If, after loading, the user is still not authenticated or not allowed,
+    // the useEffect above will have initiated a redirect to /signin.
+    // Show a loader while this redirection is happening.
+    // This state should be brief.
     return (
-       <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="h-12 w-12 animate-spin text-primary" />
       </div>
-    ); // Or a specific "Access Denied" component
+    );
   }
 
+  // If loading is false, and the user exists and is allowed, render the protected content.
   return <>{children}</>;
 }

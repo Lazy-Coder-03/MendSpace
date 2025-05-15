@@ -35,7 +35,7 @@ import {
 const SUBMISSIONS_PER_PAGE = 5;
 
 const formatTimestamp = (timestamp: FirestoreTimestamp | undefined): string => {
-  if (!timestamp || typeof timestamp.toDate !== 'function') { // Added check for toDate
+  if (!timestamp || typeof timestamp.toDate !== 'function') {
     console.warn('Invalid timestamp received by formatTimestamp:', timestamp);
     return 'N/A';
   }
@@ -70,23 +70,27 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
     setError(null);
     
     console.log(`PaginatedTableSection: Fetching for ${participantSignature}, direction: ${direction}, currentPage: ${currentPage}`);
-    if (direction === 'next') console.log('Using lastDocSnapshot ID for startAfter:', lastDocSnapshot?.id);
-    if (direction === 'prev') console.log('Using firstDocSnapshot ID for endBefore:', firstDocSnapshot?.id);
+    if (direction === 'next' && lastDocSnapshot) console.log('Using lastDocSnapshot ID for startAfter:', lastDocSnapshot?.id);
+    if (direction === 'prev' && firstDocSnapshot) console.log('Using firstDocSnapshot ID for endBefore:', firstDocSnapshot?.id);
 
     try {
       const constraints: QueryConstraint[] = [
         where('signature', '>=', participantSignature),
-        where('signature', '<=', participantSignature + '\uf8ff'),
+        where('signature', '<=', participantSignature + '\uf8ff'), // For "starts with"
       ];
 
       if (direction === 'next' && lastDocSnapshot) {
-        constraints.push(orderBy('signature', 'asc'));
+        constraints.push(orderBy('signature', 'asc')); // Match the primary range filter
         constraints.push(orderBy('createdAt', 'desc'));
         constraints.push(startAfter(lastDocSnapshot));
         constraints.push(limit(SUBMISSIONS_PER_PAGE + 1));
       } else if (direction === 'prev' && firstDocSnapshot) {
-         constraints.push(orderBy('signature', 'desc')); 
-         constraints.push(orderBy('createdAt', 'asc'));   
+         // When going "prev", we want to find documents *before* the firstDocSnapshot.
+         // We order by signature ASC (like "next") then createdAt DESC (like "next").
+         // Then use endBefore() with limitToLast(). Firestore will get the last N items
+         // *before* the cursor in that defined order.
+         constraints.push(orderBy('signature', 'asc'));
+         constraints.push(orderBy('createdAt', 'desc'));
          constraints.push(endBefore(firstDocSnapshot));
          constraints.push(limitToLast(SUBMISSIONS_PER_PAGE + 1));
       } else { // Initial load
@@ -97,73 +101,69 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
       
       const q = query(collection(db, 'submissions'), ...constraints);
       const querySnapshot = await getDocs(q);
-      let fetchedDocs = querySnapshot.docs; // QueryDocumentSnapshot[]
+      let fetchedDocs = querySnapshot.docs; 
       
-      const constraintDebug = constraints.map((c: any) => {
-        let desc = c._op || c.type || (c._f && c._f.field.stringPath) || 'limit';
-        if (c._A) desc += ` ${c._A.length}`; // for limit
-        if (c.Ct) desc += ` ${c.Ct}`; // for where op
-        if (c.yt) desc += ` val: ${c.yt[0] && c.yt[0].He && c.yt[0].He.stringValue}`; // for where value
-        return desc;
-      });
-      console.log(`PaginatedTableSection: Fetched ${fetchedDocs.length} raw documents for ${participantSignature}. Query constraints: ${constraintDebug.join(', ')}`);
-
+      console.log(`PaginatedTableSection: Fetched ${fetchedDocs.length} raw documents for ${participantSignature}.`);
 
       let docsForCurrentPage: QueryDocumentSnapshot<DocumentData>[] = [];
       let newHasNext = false;
       let newHasPrev = false;
 
       if (direction === 'prev') {
-        fetchedDocs = fetchedDocs.reverse(); // Reverse for correct chronological order
+        // Documents from limitToLast with endBefore should already be in the correct
+        // display order (e.g., if primary sort is createdAt DESC, they are in DESC order ending before cursor).
+        // No client-side reverse needed here if query is structured correctly.
         newHasPrev = fetchedDocs.length > SUBMISSIONS_PER_PAGE;
         docsForCurrentPage = newHasPrev ? fetchedDocs.slice(1) : fetchedDocs;
-        newHasNext = true; // If we moved prev, there's likely a next unless this page is empty
-                           // And we're not on the absolute first page with no prior state
-        if (docsForCurrentPage.length === 0 && currentPage === 1) newHasNext = false;
-
       } else { // 'initial' or 'next'
         newHasNext = fetchedDocs.length > SUBMISSIONS_PER_PAGE;
         docsForCurrentPage = newHasNext ? fetchedDocs.slice(0, -1) : fetchedDocs;
-        newHasPrev = direction === 'next' || (direction === 'initial' && currentPage > 1 && submissions.length > 0);
       }
 
       const newSubmissionsData = docsForCurrentPage.map(doc => {
-        console.log(`PaginatedTableSection: Mapping doc ID: ${doc.id}, Data:`, JSON.stringify(doc.data()));
+        console.log(`PaginatedTableSection: Mapping doc ID: ${doc.id}, Data signature: ${doc.data().signature}, createdAt: ${doc.data().createdAt}`);
         return { id: doc.id, ...doc.data() } as Submission;
       });
 
-      setSubmissions(newSubmissionsData);
-      
-      if (docsForCurrentPage.length > 0) {
+      if (newSubmissionsData.length > 0) {
+        setSubmissions(newSubmissionsData);
         setFirstDocSnapshot(docsForCurrentPage[0]);
         setLastDocSnapshot(docsForCurrentPage[docsForCurrentPage.length - 1]);
-      } else {
+
+        if (direction === 'initial') {
+          setCurrentPage(1);
+          setHasPrevPage(false);
+          setHasNextPage(newHasNext);
+        } else if (direction === 'next') {
+          setCurrentPage(prev => prev + 1);
+          setHasPrevPage(true);
+          setHasNextPage(newHasNext);
+        } else { // direction === 'prev'
+          setCurrentPage(prev => Math.max(1, prev - 1));
+          setHasPrevPage(newHasPrev); 
+          setHasNextPage(true);    
+        }
+      } else { // No data found for the target page
+        setSubmissions([]); 
         setFirstDocSnapshot(null);
         setLastDocSnapshot(null);
-        // If initial load and no data, ensure no next page
-        if (direction === 'initial') newHasNext = false;
-        // if next load and no data, ensure no next page
-        if (direction === 'next') newHasNext = false;
-         // if prev load and no data, ensure no prev page (if already on page 1)
-        if (direction === 'prev' && currentPage <=1 ) newHasPrev = false;
+
+        if (direction === 'initial') {
+          setCurrentPage(1);
+          setHasPrevPage(false);
+          setHasNextPage(false);
+        } else if (direction === 'next') {
+          // Tried to go next, but page was empty. Current page does not change.
+          setHasNextPage(false); 
+          // hasPrevPage remains as is (should be true if currentPage > 1)
+        } else { // direction === 'prev'
+          // Tried to go prev, but page was empty. Update current page.
+          const targetPrevPage = Math.max(1, currentPage - 1);
+          setCurrentPage(targetPrevPage);
+          setHasPrevPage(false); 
+          setHasNextPage(true); // The page we came from is still 'next'
+        }
       }
-      
-      setHasNextPage(newHasNext);
-
-      if (direction === 'initial') {
-        setCurrentPage(1);
-        setHasPrevPage(false);
-      } else if (direction === 'next' && newSubmissionsData.length > 0) {
-        setCurrentPage(prev => prev + 1);
-        setHasPrevPage(true);
-      } else if (direction === 'prev' && newSubmissionsData.length > 0) {
-        setCurrentPage(prev => Math.max(1, prev - 1));
-        setHasPrevPage(newHasPrev); // Rely on calculated newHasPrev
-      }
-      // If after a prev navigation we are at page 1, there is no previous page.
-      if (currentPage === 1 && direction === 'prev' && !newHasPrev) setHasPrevPage(false);
-
-
     } catch (err: any) {
       console.error(`PaginatedTableSection: Error fetching submissions for ${participantSignature}: `, err);
       let detailedError = `Failed to load submissions. Please try again. ${err.message}`;
@@ -174,10 +174,11 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
         }
       }
       setError(detailedError);
+      setSubmissions([]); // Clear submissions on error
     } finally {
       setIsLoading(false);
     }
-  }, [participantSignature, currentPage, firstDocSnapshot, lastDocSnapshot, submissions.length]); // Added submissions.length to re-evaluate hasPrev on initial
+  }, [participantSignature, currentPage, firstDocSnapshot, lastDocSnapshot]);
 
 
   useEffect(() => {
@@ -185,12 +186,12 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
     setSubmissions([]);
     setFirstDocSnapshot(null);
     setLastDocSnapshot(null);
-    setCurrentPage(1);
-    setHasNextPage(false);
-    setHasPrevPage(false);
+    setCurrentPage(1); // Reset to page 1
+    setHasNextPage(false); // Reset
+    setHasPrevPage(false); // Reset
     fetchSubmissionsData('initial');
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [participantSignature]); // Only re-run when participantSignature changes. fetchSubmissionsData is not needed as a dep for this specific effect.
+  }, [participantSignature]);
 
 
   if (isLoading && submissions.length === 0 && currentPage === 1) {
@@ -237,7 +238,6 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
       </Card>
     );
   }
-
 
   return (
     <Card className="mb-8 shadow-lg bg-card/90 backdrop-blur-sm">

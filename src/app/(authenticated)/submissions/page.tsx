@@ -5,30 +5,27 @@ import React from 'react';
 import { PaginatedTableSection } from '@/components/submissions/PaginatedTableSection';
 
 export default function SubmissionsPage() {
-  // IMPORTANT: Ensure these participantSignature values EXACTLY MATCH 
-  // the 'signature' field stored in Firestore for these users.
-  // This typically comes from user.displayName during submission.
-  const sayantanSignature = "Sayantan Ghosh";
-  // TODO: Update this with Ashmi's actual displayName used for signatures if different.
-  const ashmiSignature = "Ashmi Ghosh"; 
+  // Use only the first name for filtering, as the query will be a "starts with"
+  const sayantanFirstName = "Sayantan";
+  const ashmiFirstName = "Ashmi"; 
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold mb-2 text-gray-700 dark:text-gray-300">All Submissions</h1>
         <p className="text-muted-foreground">
-          View entries from {sayantanSignature} and {ashmiSignature}. Each section shows 5 entries per page.
+          View entries starting with the name "{sayantanFirstName}" and "{ashmiFirstName}". Each section shows 5 entries per page.
         </p>
       </div>
       
       <PaginatedTableSection 
-        participantSignature={sayantanSignature} 
-        title={`${sayantanSignature}’s Submissions`} 
+        participantSignature={sayantanFirstName} 
+        title={`${sayantanFirstName}’s Submissions`} 
       />
       
       <PaginatedTableSection 
-        participantSignature={ashmiSignature} 
-        title={`${ashmiSignature}’s Submissions`} 
+        participantSignature={ashmiFirstName} 
+        title={`${ashmiFirstName}’s Submissions`} 
       />
     </div>
   );

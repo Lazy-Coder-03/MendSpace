@@ -40,7 +40,7 @@ const formatTimestamp = (timestamp: FirestoreTimestamp | undefined): string => {
 };
 
 interface PaginatedTableSectionProps {
-  participantSignature: string;
+  participantSignature: string; // This will now be the first name
   title: string;
 }
 
@@ -60,30 +60,44 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
     setIsLoading(true);
     setError(null);
     
-    // Temporary log for debugging
-    console.log(`Fetching submissions for: ${participantSignature}, direction: ${direction}, currentPage: ${currentPage}`);
+    console.log(`Fetching submissions for: ${participantSignature} (first name), direction: ${direction}, currentPage: ${currentPage}`);
 
     try {
+      // Query for signatures that start with the participantSignature (first name)
+      // This requires an index on `signature` (ascending) and `createdAt` (descending).
+      // Firestore error message will provide a link if the index is missing.
       const constraints: QueryConstraint[] = [
-        where('signature', '==', participantSignature),
-        orderBy('createdAt', 'desc')
+        where('signature', '>=', participantSignature),
+        where('signature', '<=', participantSignature + '\uf8ff'), // '\uf8ff' is a high Unicode character for "starts with"
+        orderBy('signature', 'asc'), // Primary order by signature for the range scan
+        orderBy('createdAt', 'desc') // Secondary order by creation time
       ];
 
       if (direction === 'next' && lastVisibleDoc) {
         constraints.push(startAfter(lastVisibleDoc));
         constraints.push(limit(SUBMISSIONS_PER_PAGE + 1));
       } else if (direction === 'prev' && firstVisibleDoc) {
-         constraints.pop(); // Remove the default orderBy('createdAt', 'desc')
-         constraints.push(orderBy('createdAt', 'desc')); // Keep it desc for endBefore
+         // For 'prev', we need to reverse the orderBy for createdAt to go backwards effectively
+         // and use endBefore with limitToLast.
+         // Firestore sorts ASC with limitToLast on a DESC primary sort, so this needs careful handling.
+         // The primary sort is on 'signature', then 'createdAt'.
+         // To go "previous" from a set sorted by `signature` ASC then `createdAt` DESC:
+         // We need items whose `signature` is the same or less, and then `createdAt` is greater.
+         // This gets complex. A simpler approach for "prev" is to re-query from the start and skip.
+         // However, for true cursor-based "prev" with composite orders:
+         constraints.pop(); // remove orderBy('createdAt', 'desc')
+         constraints.pop(); // remove orderBy('signature', 'asc')
+         constraints.push(orderBy('signature', 'desc')); // Reverse signature order
+         constraints.push(orderBy('createdAt', 'asc'));   // Reverse createdAt order
          constraints.push(endBefore(firstVisibleDoc));
-         constraints.push(limitToLast(SUBMISSIONS_PER_PAGE + 1)); // Fetch N+1 to check if there are more previous items
+         constraints.push(limitToLast(SUBMISSIONS_PER_PAGE + 1));
       } else { // Initial load
         constraints.push(limit(SUBMISSIONS_PER_PAGE + 1));
       }
       
       const q = query(collection(db, 'submissions'), ...constraints);
       const querySnapshot = await getDocs(q);
-      const fetchedDocs = querySnapshot.docs;
+      let fetchedDocs = querySnapshot.docs;
       
       console.log(`Fetched ${fetchedDocs.length} documents for ${participantSignature}`);
 
@@ -93,40 +107,32 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
       let newHasNext = false;
       let newHasPrev = false;
 
-
       if (direction === 'prev') {
-        // Firestore returns docs in ascending order with limitToLast on a desc query. Reverse them.
-        // Then slice if we fetched an extra one for hasPrevPage check.
-        const mappedDocs = fetchedDocs.map(doc => ({ id: doc.id, ...doc.data() } as Submission));
+        // Docs are fetched in reverse order for 'prev', so reverse them back for display
+        fetchedDocs = fetchedDocs.reverse();
         newHasPrev = fetchedDocs.length > SUBMISSIONS_PER_PAGE;
-        newSubmissionsData = (newHasPrev ? mappedDocs.slice(1) : mappedDocs).reverse();
-        newHasNext = true; // If we went back, there's usually a next page (current page we came from)
+        newSubmissionsData = (newHasPrev ? fetchedDocs.slice(1) : fetchedDocs);
+         // If we went back, there's usually a next page (current page we came from)
+        newHasNext = newSubmissionsData.length > 0 || currentPage > 1; // More robust check for next
       } else { // 'initial' or 'next'
         newHasNext = fetchedDocs.length > SUBMISSIONS_PER_PAGE;
-        newSubmissionsData = fetchedDocs.map(doc => ({ id: doc.id, ...doc.data() } as Submission)).slice(0, SUBMISSIONS_PER_PAGE);
-        // For 'initial', prev is false. For 'next', prev is true.
-        newHasPrev = direction === 'next'; 
+        newSubmissionsData = fetchedDocs.slice(0, SUBMISSIONS_PER_PAGE);
+        newHasPrev = direction === 'next' || (direction === 'initial' && currentPage > 1) ; 
       }
-
 
       setSubmissions(newSubmissionsData);
       
       if (newSubmissionsData.length > 0) {
-        if (direction === 'prev') {
-            // For prev, firstVisibleDoc is the first of the reversed newSubmissionsData
-            // and lastVisibleDoc is the last of the reversed newSubmissionsData
-            newFirstDoc = fetchedDocs[newHasPrev ? 1 : 0]; // original first doc from potentially sliced set
-            newLastDoc = fetchedDocs[fetchedDocs.length -1]; // original last doc
-        } else {
-            newFirstDoc = fetchedDocs[0];
-            newLastDoc = fetchedDocs[newSubmissionsData.length - 1];
-        }
-      } else {
-        if (direction === 'prev' && currentPage > 1) newHasPrev = false;
-        if (direction === 'next') newHasNext = false;
-        if (direction === 'initial') {
-          newHasNext = false;
-          newHasPrev = false;
+          newFirstDoc = newSubmissionsData[0]; // The actual first doc of the current page
+          newLastDoc = newSubmissionsData[newSubmissionsData.length - 1]; // The actual last doc
+      } else { // No data fetched for this page
+        if (direction === 'prev' && currentPage > 1) {
+            // Stayed on the same page logically, or went to an empty previous one
+        } else if (direction === 'next') {
+            newHasNext = false; // No more next pages
+        } else if (direction === 'initial') {
+            newHasNext = false;
+            newHasPrev = false;
         }
       }
       
@@ -138,37 +144,38 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
         setHasPrevPage(false);
         setCurrentPage(1);
       } else if (direction === 'next') {
-        setHasPrevPage(true);
-        setCurrentPage(prev => prev + 1);
+        if (newSubmissionsData.length > 0) setCurrentPage(prev => prev + 1);
+        setHasPrevPage(true); // If we moved next, there's a previous
       } else if (direction === 'prev') {
-        setHasPrevPage(newHasPrev); // Determined by query result
-        setCurrentPage(prev => Math.max(1, prev - 1));
+        if (newSubmissionsData.length > 0) setCurrentPage(prev => Math.max(1, prev - 1));
+        // hasPrevPage for 'prev' direction depends on if more were fetched than needed
+        setHasPrevPage(newHasPrev);
       }
 
 
     } catch (err: any) {
       console.error(`Error fetching submissions for ${participantSignature}: `, err);
-      setError(`Failed to load submissions. Please try again. ${err.message}`);
-      // If it's an index error, provide the link
+      let detailedError = `Failed to load submissions. Please try again. ${err.message}`;
       if (err.code === 'failed-precondition' && err.message.includes('index')) {
-        // Extract the index creation URL from the error message if possible
-        const match = err.message.match(/(https:\/\/console\.firebase\.google\.com\/project\/[^/]+\/firestore\/indexes\?create_composite=[a-zA-Z0-9%_=-]+)/);
+        const match = err.message.match(/(https:\/\/console\.firebase\.google\.com\/[^"]+)/);
         if (match && match[1]) {
-          setError(prevError => `${prevError} The query requires an index. You can create it here: ${match[1]}`);
+          detailedError = `${detailedError} The query requires an index. You can create it here: ${match[1]}`;
         }
       }
+      setError(detailedError);
     } finally {
       setIsLoading(false);
     }
-  }, [participantSignature, currentPage]); // Removed lastVisibleDoc, firstVisibleDoc to avoid re-fetching on their change if currentPage is the source of truth for navigation trigger
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [participantSignature, currentPage]); // Removed lastVisibleDoc, firstVisibleDoc dependency to avoid re-fetch loops. Navigation triggers fetch.
 
   useEffect(() => {
     fetchSubmissions('initial');
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [participantSignature]);
+  }, [participantSignature]); // Only re-fetch from initial if participantSignature changes
 
 
-  if (isLoading && submissions.length === 0 && currentPage === 1) { // Show initial loader only
+  if (isLoading && submissions.length === 0 && currentPage === 1) {
     return (
       <div className="flex justify-center items-center py-10">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -205,7 +212,7 @@ export function PaginatedTableSection({ participantSignature, title }: Paginated
             <Inbox className="h-5 w-5 text-primary" />
             <AlertTitle className="text-primary/90">It's Quiet Here</AlertTitle>
             <AlertDescription className="text-foreground/70">
-              No submissions found for {participantSignature} yet.
+              No submissions found for names starting with "{participantSignature}" yet.
             </AlertDescription>
           </Alert>
         </CardContent>

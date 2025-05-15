@@ -85,7 +85,6 @@ export default function SignInPage() {
               height={150} 
               className="rounded-md" 
               priority
-              data-ai-hint="company logo monogram M"
             />
           </div>
           <CardTitle className="text-3xl font-bold text-primary">Welcome to Mendspace</CardTitle>

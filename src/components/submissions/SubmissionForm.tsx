@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -10,14 +11,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
-import type { EditableSubmissionFields, Submission } from '@/lib/types';
+import type { EditableSubmissionFields } from '@/lib/types';
 import { Loader2, Send } from 'lucide-react';
+import { 
+  getField1LabelForm, getField1PlaceholderForm,
+  getField2LabelForm, getField2PlaceholderForm,
+  getField3LabelForm, getField3PlaceholderForm,
+  getCommentsLabelForm, getCommentsPlaceholderForm
+} from '@/lib/dynamicFields';
 
 const formSchema = z.object({
-  field1: z.string().min(1, 'Field 1 is required.'),
-  field2: z.string().min(1, 'Field 2 is required.'),
-  field3: z.string().min(1, 'Field 3 is required.'),
-  comments: z.string().min(1, 'Comments are required.'),
+  field1: z.string().min(1, 'This field is required.'),
+  field2: z.string().min(1, 'This field is required.'),
+  field3: z.string().min(1, 'This field is required.'),
+  comments: z.string().optional(),
 });
 
 type SubmissionFormValues = z.infer<typeof formSchema>;
@@ -51,13 +58,12 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
 
   const handleSubmit = async (values: SubmissionFormValues) => {
     if (!user || !user.displayName) {
-      // This should ideally not happen if AuthGuard is working
       console.error("User not available for submission");
       return;
     }
     await onSubmit(values, user.displayName);
     if (!isEditing) {
-      form.reset(); // Reset form only on new submission
+      form.reset(); 
     }
   };
 
@@ -75,9 +81,9 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="field1"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Field 1</FormLabel>
+                  <FormLabel>{getField1LabelForm(user?.displayName)}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter value for Field 1" {...field} className="bg-background/70"/>
+                    <Textarea placeholder={getField1PlaceholderForm(user?.displayName)} {...field} className="bg-background/70 min-h-[100px]"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -88,9 +94,9 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="field2"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Field 2</FormLabel>
+                  <FormLabel>{getField2LabelForm()}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter value for Field 2" {...field} className="bg-background/70"/>
+                    <Textarea placeholder={getField2PlaceholderForm()} {...field} className="bg-background/70 min-h-[100px]"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -101,9 +107,9 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="field3"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Field 3</FormLabel>
+                  <FormLabel>{getField3LabelForm(user?.displayName)}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter value for Field 3" {...field} className="bg-background/70"/>
+                    <Textarea placeholder={getField3PlaceholderForm(user?.displayName)} {...field} className="bg-background/70 min-h-[100px]"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -114,9 +120,9 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="comments"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Comments</FormLabel>
+                  <FormLabel>{getCommentsLabelForm()}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Enter your comments" {...field} className="min-h-[100px] bg-background/70"/>
+                    <Textarea placeholder={getCommentsPlaceholderForm()} {...field} className="min-h-[100px] bg-background/70"/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

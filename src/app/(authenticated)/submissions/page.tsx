@@ -1,14 +1,21 @@
+
 "use client";
 
 import React, { useEffect, useState } from 'react';
 import { collection, query, orderBy, onSnapshot, Timestamp as FirestoreTimestamp } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import type { Submission } from '@/lib/types';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, Inbox, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { format } from 'date-fns';
+import { 
+  getField1DisplayLabel, 
+  getField2DisplayLabel, 
+  getField3DisplayLabel,
+  getCommentsDisplayLabel
+} from '@/lib/dynamicFields';
 
 // Helper to format Firestore Timestamp
 const formatTimestamp = (timestamp: FirestoreTimestamp | undefined): string => {
@@ -18,6 +25,13 @@ const formatTimestamp = (timestamp: FirestoreTimestamp | undefined): string => {
 
 
 const SubmissionsTable = ({ title, submissions, isLoading }: { title: string, submissions: Submission[], isLoading: boolean }) => {
+  let submissionAuthorName = '';
+  if (title.toLowerCase().includes('sayantan')) {
+    submissionAuthorName = 'Sayantan';
+  } else if (title.toLowerCase().includes('ashmi')) {
+    submissionAuthorName = 'Ashmi';
+  }
+  
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-10">
@@ -33,7 +47,7 @@ const SubmissionsTable = ({ title, submissions, isLoading }: { title: string, su
         <Inbox className="h-5 w-5 text-primary" />
         <AlertTitle className="text-primary/90">It's Quiet Here</AlertTitle>
         <AlertDescription className="text-foreground/70">
-          No submissions found for {title.replace("'s Submissions", "")} yet.
+          No submissions found for {title.replace("'s Submissions", "").replace("’s Submissions", "")} yet.
         </AlertDescription>
       </Alert>
     );
@@ -49,12 +63,12 @@ const SubmissionsTable = ({ title, submissions, isLoading }: { title: string, su
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead className="w-[150px]">Field 1</TableHead>
-                <TableHead className="w-[150px]">Field 2</TableHead>
-                <TableHead className="w-[150px]">Field 3</TableHead>
-                <TableHead>Comments</TableHead>
-                <TableHead className="w-[150px]">Signature</TableHead>
-                <TableHead className="w-[200px]">Timestamp</TableHead>
+                <TableHead className="w-[200px] min-w-[150px]">{getField1DisplayLabel(submissionAuthorName)}</TableHead>
+                <TableHead className="w-[200px] min-w-[150px]">{getField2DisplayLabel(submissionAuthorName)}</TableHead>
+                <TableHead className="w-[200px] min-w-[150px]">{getField3DisplayLabel(submissionAuthorName)}</TableHead>
+                <TableHead className="min-w-[200px]">{getCommentsDisplayLabel()}</TableHead>
+                <TableHead className="w-[150px] min-w-[120px]">Signature</TableHead>
+                <TableHead className="w-[200px] min-w-[180px]">Timestamp</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -63,7 +77,7 @@ const SubmissionsTable = ({ title, submissions, isLoading }: { title: string, su
                   <TableCell className="font-medium truncate max-w-xs">{sub.field1}</TableCell>
                   <TableCell className="truncate max-w-xs">{sub.field2}</TableCell>
                   <TableCell className="truncate max-w-xs">{sub.field3}</TableCell>
-                  <TableCell className="truncate max-w-md">{sub.comments}</TableCell>
+                  <TableCell className="truncate max-w-md">{sub.comments || 'N/A'}</TableCell>
                   <TableCell className="text-muted-foreground">{sub.signature}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{formatTimestamp(sub.createdAt)}</TableCell>
                 </TableRow>
@@ -102,10 +116,10 @@ export default function SubmissionsPage() {
   }, []);
 
   const sayantanSubmissions = allSubmissions.filter(sub => 
-    sub.signature?.toLowerCase().startsWith('sayantan')
+    (sub.displayName?.toLowerCase().startsWith('sayantan') || sub.signature?.toLowerCase().startsWith('sayantan'))
   );
   const ashmiSubmissions = allSubmissions.filter(sub => 
-    sub.signature?.toLowerCase().startsWith('ashmi')
+    (sub.displayName?.toLowerCase().startsWith('ashmi') || sub.signature?.toLowerCase().startsWith('ashmi'))
   );
 
   if (error) {

@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -27,7 +28,7 @@ export default function PreviousSubmissionsPage() {
       (querySnapshot) => {
         const subs = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Submission));
         setAllSubmissions(subs);
-        setFilteredSubmissions(subs); // Initialize filtered with all
+        setFilteredSubmissions(subs); 
         setIsLoading(false);
         setError(null);
       },
@@ -51,8 +52,9 @@ export default function PreviousSubmissionsPage() {
       sub.field1.toLowerCase().includes(lowerSearchTerm) ||
       sub.field2.toLowerCase().includes(lowerSearchTerm) ||
       sub.field3.toLowerCase().includes(lowerSearchTerm) ||
-      sub.comments.toLowerCase().includes(lowerSearchTerm) ||
-      sub.signature.toLowerCase().includes(lowerSearchTerm)
+      (sub.comments && sub.comments.toLowerCase().includes(lowerSearchTerm)) || // Check if comments exist
+      sub.signature.toLowerCase().includes(lowerSearchTerm) ||
+      (sub.displayName && sub.displayName.toLowerCase().includes(lowerSearchTerm))
     );
     setFilteredSubmissions(filtered);
   }, [searchTerm, allSubmissions]);
@@ -67,10 +69,7 @@ export default function PreviousSubmissionsPage() {
   });
   
   const handleSubmissionUpdate = () => {
-    // This function is called by SubmissionCard after an update.
-    // The onSnapshot listener should automatically update the state,
-    // but if a forced re-fetch or re-filter is needed, it can be done here.
-    // For now, relying on onSnapshot.
+    // onSnapshot should handle updates.
   };
 
   if (isLoading) {
@@ -92,21 +91,23 @@ export default function PreviousSubmissionsPage() {
     );
   }
   
-  const userIsAllowed = user?.displayName?.toLowerCase().startsWith('sayantan') || user?.displayName?.toLowerCase().startsWith('ashmi');
+  // User edit permission check is handled within SubmissionCard now
+  const userIsAdmin = user?.displayName?.toLowerCase().startsWith('sayantan') || user?.displayName?.toLowerCase().startsWith('ashmi');
+
 
   return (
     <div className="space-y-10">
       <div>
         <h1 className="text-3xl font-bold mb-2 text-gray-700 dark:text-gray-300">Previous Submissions</h1>
         <p className="text-muted-foreground">
-          Browse through all past entries. {userIsAllowed ? "You can edit your own." : "Entries are view-only for you."}
+          Browse through all past entries. {userIsAdmin ? "You can edit your own." : "Entries are view-only for you."}
         </p>
       </div>
 
       <div className="relative mb-6">
         <Input 
           type="text"
-          placeholder="Search submissions (field1, field2, field3, comments, signature)..."
+          placeholder="Search entries by statements, feelings, defences, comments, or signature..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10 py-3 text-base bg-card border-border/70 focus:border-primary focus:ring-primary"

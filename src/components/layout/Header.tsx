@@ -32,10 +32,10 @@ export function Header() {
             </SheetTrigger>
             <SheetContent 
               side="left" 
-              className="w-[280px] sm:w-[320px] p-0 bg-secondary/20 backdrop-blur-md border-secondary/30" // Pastel pinkish, translucent background
+              className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)]" // Solid dark pastel lavender
             >
-              <SheetHeader className="p-4 pb-2 border-b border-secondary/40">
-                <SheetTitle className="text-secondary-foreground">Menu</SheetTitle> {/* Darker text for contrast */}
+              <SheetHeader className="p-4 pb-2 border-b border-[hsl(270,60%,65%)]">
+                <SheetTitle className="text-accent-foreground">Menu</SheetTitle> {/* Darker text for contrast */}
               </SheetHeader>
               <div className="p-4">
                  <Link href="/home" className="flex items-center gap-2 text-2xl font-bold text-primary hover:text-primary/80 transition-colors mb-6" onClick={handleLinkClick}>
@@ -68,3 +68,4 @@ export function Header() {
     </header>
   );
 }
+

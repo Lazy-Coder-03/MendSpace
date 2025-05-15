@@ -146,10 +146,10 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
             <TableHeader className="bg-muted/50">
               <TableRow>
                 <TableHead className="w-[50px] text-center border-r">#</TableHead>
-                <TableHead className="border-r">{getField1DisplayLabel(participantFirstName)}</TableHead>
-                <TableHead className="border-r">{getField2DisplayLabel(participantFirstName)}</TableHead>
-                <TableHead className="border-r">{getField3DisplayLabel(participantFirstName)}</TableHead>
-                <TableHead className="border-r">{getCommentsDisplayLabel()}</TableHead>
+                <TableHead className="border-r whitespace-pre-wrap break-words">{getField1DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="border-r whitespace-pre-wrap break-words">{getField2DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="border-r whitespace-pre-wrap break-words">{getField3DisplayLabel(participantFirstName)}</TableHead>
+                <TableHead className="border-r whitespace-pre-wrap break-words">{getCommentsDisplayLabel()}</TableHead>
                 <TableHead className="w-[180px]">Timestamp</TableHead>
               </TableRow>
             </TableHeader>
@@ -169,7 +169,7 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
         </div>
         {submissions.length === SUBMISSIONS_TO_SHOW && (
           <p className="text-sm text-muted-foreground mt-4 text-center">
-            Showing the {SUBMISSIONS_TO_SHOW} most recent entries. For older entries, please see the "Previous Entries" page.
+            Showing the {SUBMISSIONS_TO_SHOW} most recent entries. For older entries, please see the "All Entries" page.
           </p>
         )}
       </CardContent>

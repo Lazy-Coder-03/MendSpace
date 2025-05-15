@@ -3,7 +3,7 @@
 
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithPopup, UserCredential } from 'firebase/auth';
+import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '@/firebase/config';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -38,12 +38,18 @@ export default function SignInPage() {
       await signInWithPopup(auth, googleProvider);
       // The AuthProvider's onAuthStateChanged will handle redirection and access checks.
     } catch (error: any) {
-      console.error("Google Sign-In Error: ", error);
-      toast({
-        title: 'Sign In Failed',
-        description: error.message || 'Could not sign in with Google. Please try again.',
-        variant: 'destructive',
-      });
+      if (error.code === 'auth/popup-closed-by-user') {
+        // User closed the popup, this is not a system error.
+        // No toast needed, or a very mild, non-error one.
+        console.log("Google Sign-In: Popup closed by user.");
+      } else {
+        console.error("Google Sign-In Error: ", error);
+        toast({
+          title: 'Sign In Failed',
+          description: error.message || 'Could not sign in with Google. Please try again.',
+          variant: 'destructive',
+        });
+      }
     } finally {
       setIsSigningIn(false);
     }
@@ -96,5 +102,3 @@ export default function SignInPage() {
     </div>
   );
 }
-
-    

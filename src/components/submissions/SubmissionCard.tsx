@@ -32,8 +32,23 @@ import {
 
 const formatTimestamp = (timestamp: FirestoreTimestamp | undefined, label: string = "Submitted"): string => {
   if (!timestamp) return `${label}: N/A`;
-  return `${label}: ${format(timestamp.toDate(), 'MMM d, yyyy HH:mm')}`;
+  try {
+    // Ensure timestamp is a valid Firestore Timestamp-like object
+    if (timestamp && typeof timestamp.toDate === 'function') {
+      return `${label}: ${format(timestamp.toDate(), 'MMM d, yyyy HH:mm')}`;
+    }
+    // Fallback for potentially already converted dates or different timestamp structures
+    if (timestamp instanceof Date) {
+      return `${label}: ${format(timestamp, 'MMM d, yyyy HH:mm')}`;
+    }
+    console.warn("Invalid timestamp format for submission:", timestamp);
+    return `${label}: Invalid Date`;
+  } catch (error) {
+    console.error("Error formatting timestamp:", error);
+    return `${label}: Date Error`;
+  }
 };
+
 
 interface SubmissionCardProps {
   submission: Submission;
@@ -115,14 +130,14 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel 
-                        className="bg-[linear-gradient(to_right,hsl(0,85%,88%),hsl(25,85%,85%))] text-primary-foreground border-transparent hover:brightness-105 shadow-md hover:shadow-lg"
+                        className="bg-[linear-gradient(to_right,hsl(120,70%,85%),hsl(150,70%,80%))] text-primary-foreground border-transparent hover:brightness-105 shadow-md hover:shadow-lg"
                       >
                         Cancel
                       </AlertDialogCancel>
                       <AlertDialogAction 
                         onClick={handleDeleteConfirm} 
                         disabled={isDeleting}
-                        className={buttonVariants({ variant: "destructive" })}
+                        className="bg-[linear-gradient(to_right,hsl(0,85%,88%),hsl(25,85%,85%))] text-primary-foreground border-transparent hover:brightness-105 shadow-md hover:shadow-lg"
                       >
                         {isDeleting ? 'Removing...' : 'Yes, remove it'}
                       </AlertDialogAction>
@@ -172,3 +187,4 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
     </>
   );
 }
+

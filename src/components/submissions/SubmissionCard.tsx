@@ -103,7 +103,7 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
                       <span className="sr-only">Remove Submission</span>
                     </Button>
                   </AlertDialogTrigger>
-                  <AlertDialogContent>
+                  <AlertDialogContent className="bg-yellow-100 border-yellow-300">
                     <AlertDialogHeader>
                       <AlertDialogTitle className="flex items-center">
                         <AlertTriangle className="h-5 w-5 mr-2 text-destructive" />

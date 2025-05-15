@@ -31,10 +31,10 @@ export function EditSubmissionDialog({ submission, isOpen, onOpenChange, onSave,
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-primary/20 border-primary/30"> {/* Pastel blue background */}
+      <DialogContent className="sm:max-w-[600px] bg-card border-border"> {/* Changed bg-primary/20 to bg-card and adjusted border */}
         <DialogHeader>
-          <DialogTitle className="text-primary-foreground">Edit Submission</DialogTitle> {/* Darker text for contrast */}
-          <DialogDescription className="text-foreground/80"> {/* Slightly lighter dark text */}
+          <DialogTitle className="text-foreground">Edit Submission</DialogTitle> {/* Ensured text uses theme foreground */}
+          <DialogDescription className="text-muted-foreground"> {/* Ensured text uses theme muted-foreground */}
             Make changes to your submission. Fields like signature and original timestamp will remain unchanged.
           </DialogDescription>
         </DialogHeader>

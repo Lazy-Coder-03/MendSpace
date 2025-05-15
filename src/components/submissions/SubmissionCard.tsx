@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import type { Submission, EditableSubmissionFields } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button, buttonVariants } from '@/components/ui/button'; // Added buttonVariants import
+import { Button, buttonVariants } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { EditSubmissionDialog } from './EditSubmissionDialog';
 import { Timestamp as FirestoreTimestamp, doc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
@@ -137,20 +137,20 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
         <CardContent className="space-y-4 text-sm">
           <div>
             <strong className="flex items-center"><MessageSquareText className="h-4 w-4 mr-2 text-primary/80" />{getField1DisplayLabel(authorName)}:</strong> 
-            <p className="text-foreground/80 pl-6 mt-1 whitespace-pre-wrap">{submission.field1}</p>
+            <p className="text-foreground/80 pl-6 mt-1 whitespace-pre-wrap break-words">{submission.field1}</p>
           </div>
           <div>
             <strong className="flex items-center"><Heart className="h-4 w-4 mr-2 text-primary/80" />{getField2DisplayLabel(authorName)}:</strong> 
-            <p className="text-foreground/80 pl-6 mt-1 whitespace-pre-wrap">{submission.field2}</p>
+            <p className="text-foreground/80 pl-6 mt-1 whitespace-pre-wrap break-words">{submission.field2}</p>
           </div>
           <div>
             <strong className="flex items-center"><Shield className="h-4 w-4 mr-2 text-primary/80" />{getField3DisplayLabel(authorName)}:</strong> 
-            <p className="text-foreground/80 pl-6 mt-1 whitespace-pre-wrap">{submission.field3}</p>
+            <p className="text-foreground/80 pl-6 mt-1 whitespace-pre-wrap break-words">{submission.field3}</p>
           </div>
           {submission.comments && (
             <div className="pt-2">
               <strong className="block mb-1">{getCommentsDisplayLabel()}:</strong>
-              <p className="text-foreground/80 bg-muted/30 p-3 rounded-md border border-border/50 whitespace-pre-wrap">{submission.comments}</p>
+              <p className="text-foreground/80 bg-muted/30 p-3 rounded-md border border-border/50 whitespace-pre-wrap break-words">{submission.comments}</p>
             </div>
           )}
         </CardContent>
@@ -168,4 +168,3 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
     </>
   );
 }
-

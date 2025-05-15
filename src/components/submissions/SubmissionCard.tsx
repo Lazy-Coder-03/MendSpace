@@ -7,10 +7,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { EditSubmissionDialog } from './EditSubmissionDialog';
-import { Timestamp as FirestoreTimestamp, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { Timestamp as FirestoreTimestamp, doc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, CheckCircle, Clock, UserCircle, MessageSquareText, Heart, Shield } from 'lucide-react'; // Added icons
+import { Edit, Trash2, CheckCircle, Clock, UserCircle, MessageSquareText, Heart, Shield, AlertTriangle } from 'lucide-react';
 import { format } from 'date-fns';
 import { 
   getField1DisplayLabel, 
@@ -18,8 +18,18 @@ import {
   getField3DisplayLabel,
   getCommentsDisplayLabel
 } from '@/lib/dynamicFields';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
-// Helper to format Firestore Timestamp
 const formatTimestamp = (timestamp: FirestoreTimestamp | undefined, label: string = "Submitted"): string => {
   if (!timestamp) return `${label}: N/A`;
   return `${label}: ${format(timestamp.toDate(), 'MMM d, yyyy HH:mm')}`;
@@ -27,16 +37,17 @@ const formatTimestamp = (timestamp: FirestoreTimestamp | undefined, label: strin
 
 interface SubmissionCardProps {
   submission: Submission;
-  onSubmissionUpdate: () => void; // Callback to refresh list after update
+  onSubmissionUpdate: () => void; 
 }
 
 export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCardProps) {
   const { user } = useAuth();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
-  const canEdit = user?.uid === submission.uid;
+  const canEditOrDelete = user?.uid === submission.uid;
   const authorName = submission.displayName || submission.signature;
 
   const handleSaveEdit = async (submissionId: string, data: EditableSubmissionFields) => {
@@ -58,17 +69,63 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
     }
   };
 
+  const handleDeleteConfirm = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteDoc(doc(db, 'submissions', submission.id));
+      toast({ title: 'Success', description: 'Submission removed successfully.' });
+      onSubmissionUpdate(); // Refresh the list
+      // AlertDialog will close itself via its cancel/action buttons or onOpenChange
+    } catch (error) {
+      console.error('Error removing submission: ', error);
+      toast({ title: 'Error', description: 'Failed to remove submission.', variant: 'destructive' });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
     <>
       <Card className="mb-6 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card/90 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="text-xl text-primary flex justify-between items-center">
             Entry by {authorName}
-            {canEdit && (
-              <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)} className="text-primary hover:text-accent-foreground hover:bg-accent">
-                <Edit className="h-5 w-5" />
-                <span className="sr-only">Edit Submission</span>
-              </Button>
+            {canEditOrDelete && (
+              <div className="flex items-center space-x-1">
+                <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)} className="text-primary hover:text-accent-foreground hover:bg-accent">
+                  <Edit className="h-5 w-5" />
+                  <span className="sr-only">Edit Submission</span>
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="text-destructive/70 hover:text-destructive hover:bg-destructive/10">
+                      <Trash2 className="h-5 w-5" />
+                      <span className="sr-only">Remove Submission</span>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle className="flex items-center">
+                        <AlertTriangle className="h-5 w-5 mr-2 text-destructive" />
+                        Are you absolutely sure?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This action cannot be undone. This will permanently delete this submission.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction 
+                        onClick={handleDeleteConfirm} 
+                        disabled={isDeleting}
+                        className={buttonVariants({ variant: "destructive" })}
+                      >
+                        {isDeleting ? 'Removing...' : 'Yes, remove it'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             )}
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground flex items-center space-x-4 pt-1">
@@ -99,7 +156,7 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
         </CardContent>
       </Card>
 
-      {canEdit && (
+      {canEditOrDelete && (
         <EditSubmissionDialog
           submission={submission}
           isOpen={isEditDialogOpen}

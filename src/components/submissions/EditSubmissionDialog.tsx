@@ -1,10 +1,11 @@
+
 "use client";
 
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { SubmissionForm } from './SubmissionForm';
 import type { Submission, EditableSubmissionFields } from '@/lib/types';
-import { Button } from '../ui/button';
+// Removed DialogFooter, DialogClose, Button as they are not used directly here anymore
 
 interface EditSubmissionDialogProps {
   submission: Submission;
@@ -30,10 +31,10 @@ export function EditSubmissionDialog({ submission, isOpen, onOpenChange, onSave,
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-card/95 backdrop-blur-md">
+      <DialogContent className="sm:max-w-[600px] bg-primary/20 border-primary/30"> {/* Pastel blue background */}
         <DialogHeader>
-          <DialogTitle className="text-primary">Edit Submission</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-primary-foreground">Edit Submission</DialogTitle> {/* Darker text for contrast */}
+          <DialogDescription className="text-foreground/80"> {/* Slightly lighter dark text */}
             Make changes to your submission. Fields like signature and original timestamp will remain unchanged.
           </DialogDescription>
         </DialogHeader>
@@ -44,12 +45,6 @@ export function EditSubmissionDialog({ submission, isOpen, onOpenChange, onSave,
           isEditing={true}
           isLoading={isLoading}
         />
-        {/* The submit button is part of SubmissionForm. If an external close button is needed: */}
-        {/* <DialogFooter className="mt-4">
-          <DialogClose asChild>
-            <Button type="button" variant="outline">Cancel</Button>
-          </DialogClose>
-        </DialogFooter> */}
       </DialogContent>
     </Dialog>
   );

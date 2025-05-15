@@ -10,7 +10,7 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[linear-gradient(to_right,var(--gradient-start-color),var(--gradient-end-color))] text-primary-foreground hover:brightness-105", // Updated to use gradient
+        default: "bg-[linear-gradient(to_right,var(--gradient-start-color),var(--gradient-end-color))] text-primary-foreground hover:brightness-105", 
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         outline:
@@ -55,5 +55,3 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button"
 
 export { Button, buttonVariants }
-
-    

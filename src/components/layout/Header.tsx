@@ -8,8 +8,7 @@ import Link from 'next/link';
 import { LogIn, Menu } from 'lucide-react'; 
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-// import { ThemeToggle } from './ThemeToggle'; // Removed ThemeToggle
-import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from '@/components/ui/sheet'; 
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet'; 
 import { Navigation } from './Navigation'; 
 
 export function Header() {
@@ -33,10 +32,10 @@ export function Header() {
             </SheetTrigger>
             <SheetContent 
               side="left" 
-              className="w-[280px] sm:w-[320px] p-0 bg-card/90 backdrop-blur-md" // Added translucency and blur
+              className="w-[280px] sm:w-[320px] p-0 bg-secondary/20 backdrop-blur-md border-secondary/30" // Pastel pinkish, translucent background
             >
-              <SheetHeader className="p-4 pb-2 border-b">
-                <SheetTitle className="text-xl text-primary">Menu</SheetTitle>
+              <SheetHeader className="p-4 pb-2 border-b border-secondary/40">
+                <SheetTitle className="text-secondary-foreground">Menu</SheetTitle> {/* Darker text for contrast */}
               </SheetHeader>
               <div className="p-4">
                  <Link href="/home" className="flex items-center gap-2 text-2xl font-bold text-primary hover:text-primary/80 transition-colors mb-6" onClick={handleLinkClick}>
@@ -55,7 +54,6 @@ export function Header() {
         </div>
         
         <div className="flex items-center gap-3 sm:gap-4">
-          {/* <ThemeToggle /> Removed ThemeToggle */}
           {!loading && (
             user ? <SignOutButton /> : (
               <Button asChild variant="outline" className="shadow-sm hover:shadow-md">

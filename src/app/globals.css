@@ -5,108 +5,109 @@
 
 @layer base {
   :root {
-    --background: hsl(220, 60%, 98%); /* Very pale blue-white */
-    --foreground: hsl(240, 10%, 30%); /* Dark grayish blue */
+    /* Light Theme - Soothing Pastels with Pink/Blue Gradient Focus */
+    --background: hsl(220, 60%, 98%); /* Base, very pale for gradient to pop */
+    --foreground: hsl(240, 10%, 25%); /* Darker, softer text for readability */
 
-    --card: hsl(0, 0%, 100%); /* White */
-    --card-foreground: hsl(240, 10%, 30%);
+    --card: hsl(0, 0%, 100%); 
+    --card-foreground: hsl(240, 10%, 25%);
 
     --popover: hsl(0, 0%, 100%);
-    --popover-foreground: hsl(240, 10%, 30%);
+    --popover-foreground: hsl(240, 10%, 25%);
 
-    --primary: hsl(210, 90%, 75%); /* Brighter Pastel Blue */
-    --primary-foreground: hsl(210, 25%, 15%); /* Darker blue for contrast */
+    --primary: hsl(210, 90%, 70%); /* Brighter Pastel Blue for primary elements */
+    --primary-foreground: hsl(210, 25%, 10%); 
     
-    --secondary: hsl(330, 90%, 88%); /* Brighter Pastel Pink */
-    --secondary-foreground: hsl(330, 25%, 15%); /* Darker pink for contrast */
+    --secondary: hsl(330, 90%, 85%); /* Brighter Pastel Pink for secondary elements */
+    --secondary-foreground: hsl(330, 25%, 10%);
 
-    --muted: hsl(220, 40%, 94%); /* Muted grayish blue - slightly softer */
-    --muted-foreground: hsl(220, 15%, 50%); /* Grayer text for muted elements */
+    --muted: hsl(220, 40%, 92%); 
+    --muted-foreground: hsl(220, 15%, 45%); 
 
-    --accent: hsl(270, 80%, 90%); /* Pastel Lavender for non-gradient accents */
-    --accent-foreground: hsl(270, 30%, 20%); /* Darker lavender for contrast */
+    --accent: hsl(270, 80%, 88%); /* Pastel Lavender for non-gradient accents */
+    --accent-foreground: hsl(270, 30%, 15%); 
     
-    --destructive: hsl(0, 75%, 65%); /* Softer red - slightly brighter */
+    --destructive: hsl(0, 70%, 60%); 
     --destructive-foreground: hsl(0, 0%, 100%);
 
-    --border: hsl(220, 40%, 90%); /* Softer light border */
-    --input: hsl(220, 50%, 96%); /* Very light pastel blue for input backgrounds */
-    --ring: hsl(240, 80%, 85%); /* Lavender-blue for focus rings */
+    --border: hsl(220, 30%, 88%); 
+    --input: hsl(220, 50%, 95%); 
+    --ring: hsl(210, 90%, 75%); /* Brighter blue for focus rings */
     
-    --radius: 0.75rem; /* More rounded corners for a softer feel */
+    --radius: 0.75rem;
 
     /* Gradient Colors - Light Theme */
     --gradient-start-color: hsl(330, 90%, 90%); /* Lighter Pastel Pink */
     --gradient-end-color: hsl(210, 90%, 88%);   /* Lighter Pastel Blue */
 
-    /* Chart Colors - Light Theme */
-    --chart-1: hsl(210, 80%, 75%); 
-    --chart-2: hsl(330, 70%, 80%); 
-    --chart-3: hsl(270, 70%, 80%); /* Pastel Lavender */
-    --chart-4: hsl(180, 60%, 75%); 
-    --chart-5: hsl(40, 80%, 80%);  
+    /* Chart Colors - Light Theme (Pastel & Soothing) */
+    --chart-1: hsl(210, 85%, 80%); 
+    --chart-2: hsl(330, 75%, 85%); 
+    --chart-3: hsl(270, 75%, 88%); 
+    --chart-4: hsl(180, 65%, 80%); 
+    --chart-5: hsl(40, 85%, 85%);  
 
-    /* Sidebar Colors - Light Theme */
-    --sidebar-background: hsl(220, 60%, 97%); /* Slightly off-white blue */
-    --sidebar-foreground: hsl(240, 10%, 25%);
-    --sidebar-primary: hsl(210, 90%, 80%);
+    /* Sidebar Colors - Light Theme (Consistent with main pastels) */
+    --sidebar-background: hsl(220, 50%, 97%); 
+    --sidebar-foreground: hsl(240, 10%, 20%);
+    --sidebar-primary: hsl(210, 90%, 75%);
     --sidebar-primary-foreground: hsl(210, 25%, 10%);
-    --sidebar-accent: hsl(270, 75%, 94%); 
-    --sidebar-accent-foreground: hsl(270, 25%, 10%);
-    --sidebar-border: hsl(220, 35%, 92%);
-    --sidebar-ring: hsl(240, 75%, 88%);
+    --sidebar-accent: hsl(330, 80%, 92%); 
+    --sidebar-accent-foreground: hsl(330, 25%, 10%);
+    --sidebar-border: hsl(220, 30%, 90%);
+    --sidebar-ring: hsl(210, 85%, 80%);
   }
 
   .dark {
-    --background: hsl(240, 15%, 12%); /* Deep, dark blue-gray */
-    --foreground: hsl(220, 30%, 88%); /* Light, soft blue-gray text */
+    /* Dark Theme - Darkened Pastels with Brighter Text */
+    --background: hsl(230, 20%, 10%); /* Deep, dark, slightly desaturated blue */
+    --foreground: hsl(210, 30%, 92%); /* Bright, clear text */
 
-    --card: hsl(240, 12%, 18%); /* Slightly lighter dark card */
-    --card-foreground: hsl(220, 30%, 88%);
+    --card: hsl(230, 18%, 14%); 
+    --card-foreground: hsl(210, 30%, 90%);
 
-    --popover: hsl(240, 12%, 18%);
-    --popover-foreground: hsl(220, 30%, 88%);
+    --popover: hsl(230, 18%, 14%);
+    --popover-foreground: hsl(210, 30%, 90%);
 
-    --primary: hsl(210, 70%, 65%); /* Muted pastel blue for dark mode */
-    --primary-foreground: hsl(210, 15%, 95%);
+    --primary: hsl(210, 80%, 68%); /* Darkened pastel blue, still vibrant */
+    --primary-foreground: hsl(210, 20%, 97%); /* Very bright text for primary elements */
     
-    --secondary: hsl(330, 60%, 75%); /* Muted pastel pink for dark mode */
-    --secondary-foreground: hsl(330, 15%, 95%);
+    --secondary: hsl(330, 70%, 72%); /* Darkened pastel pink */
+    --secondary-foreground: hsl(330, 15%, 96%);
 
-    --muted: hsl(220, 15%, 28%); /* Darker muted */
+    --muted: hsl(230, 15%, 22%); 
     --muted-foreground: hsl(220, 15%, 70%);
 
-    --accent: hsl(270, 60%, 75%); /* Muted pastel lavender for dark mode */
-    --accent-foreground: hsl(270, 15%, 95%);
+    --accent: hsl(270, 65%, 75%); /* Darkened pastel lavender */
+    --accent-foreground: hsl(270, 15%, 96%);
     
-    --destructive: hsl(0, 65%, 55%); /* Darker, but still visible red */
-    --destructive-foreground: hsl(0, 0%, 95%);
+    --destructive: hsl(0, 65%, 58%); 
+    --destructive-foreground: hsl(0, 0%, 97%);
 
-    --border: hsl(240, 10%, 25%);
-    --input: hsl(240, 10%, 22%);
-    --ring: hsl(240, 60%, 70%);
+    --border: hsl(230, 15%, 20%);
+    --input: hsl(230, 15%, 17%);
+    --ring: hsl(210, 80%, 70%);
 
-    /* Gradient Colors - Dark Theme */
-    --gradient-start-color: hsl(330, 65%, 65%); /* Darker Muted Pastel Pink */
-    --gradient-end-color: hsl(210, 70%, 60%);   /* Darker Muted Pastel Blue */
+    /* Gradient Colors - Dark Theme (Darker, more subtle if used) */
+    --gradient-start-color: hsl(330, 55%, 55%); 
+    --gradient-end-color: hsl(210, 60%, 50%);   
 
+    /* Chart Colors - Dark Theme (Darkened pastels) */
+    --chart-1: hsl(210, 70%, 60%);
+    --chart-2: hsl(330, 60%, 65%);
+    --chart-3: hsl(270, 60%, 68%);
+    --chart-4: hsl(180, 50%, 60%);
+    --chart-5: hsl(40, 70%, 65%);
 
-    /* Chart Colors - Dark Theme */
-    --chart-1: hsl(210, 60%, 55%);
-    --chart-2: hsl(330, 50%, 60%);
-    --chart-3: hsl(270, 50%, 60%);
-    --chart-4: hsl(180, 40%, 55%);
-    --chart-5: hsl(40, 60%, 60%);
-
-    /* Sidebar Colors - Dark Theme */
-    --sidebar-background: hsl(240, 15%, 15%); 
-    --sidebar-foreground: hsl(220, 25%, 85%);
-    --sidebar-primary: hsl(210, 70%, 60%);
-    --sidebar-primary-foreground: hsl(210, 15%, 95%);
-    --sidebar-accent: hsl(270, 55%, 70%);
-    --sidebar-accent-foreground: hsl(270, 15%, 95%);
-    --sidebar-border: hsl(240, 10%, 28%);
-    --sidebar-ring: hsl(240, 55%, 65%);
+    /* Sidebar Colors - Dark Theme (Consistent with main dark pastels) */
+    --sidebar-background: hsl(230, 18%, 12%); 
+    --sidebar-foreground: hsl(210, 25%, 88%);
+    --sidebar-primary: hsl(210, 75%, 65%);
+    --sidebar-primary-foreground: hsl(210, 15%, 96%);
+    --sidebar-accent: hsl(330, 60%, 70%);
+    --sidebar-accent-foreground: hsl(330, 15%, 96%);
+    --sidebar-border: hsl(230, 15%, 24%);
+    --sidebar-ring: hsl(210, 70%, 68%);
   }
 }
 
@@ -115,12 +116,21 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground min-h-screen;
+    @apply text-foreground min-h-screen;
     font-family: var(--font-poppins), sans-serif;
   }
 
+  /* Apply gradient background for light theme, solid for dark */
+  html:not(.dark) body {
+    @apply bg-[linear-gradient(to_bottom_right,var(--gradient-start-color),var(--gradient-end-color))];
+  }
+  html.dark body {
+    @apply bg-background;
+  }
+
+
   /* Add soft drop shadows to cards and buttons */
-  .card, .btn { /* .btn class can be added to buttons if needed for global shadow */
+  .card, .btn { 
     @apply shadow-lg; 
   }
   
@@ -130,16 +140,10 @@
   }
 
   button:hover, a:hover {
-    @apply transform scale-[1.03]; 
+    @apply transform scale-[1.02]; /* Slightly more subtle hover scale */
   }
 
-  /* Specific gradient for main action buttons */
-  .btn-primary-gradient {
-    @apply bg-[linear-gradient(to_right,var(--gradient-start-color),var(--gradient-end-color))] text-primary-foreground;
-  }
-  .btn-primary-gradient:hover {
-    @apply brightness-110; /* Slight brightness increase on hover for gradient */
-  }
+  /* Specific gradient for main action buttons - applied in button.tsx */
+  /* .btn-primary-gradient class is effectively handled by the default button variant now */
+
 }
-
-    

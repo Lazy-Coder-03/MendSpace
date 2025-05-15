@@ -5,12 +5,12 @@ import React, { useState } from 'react';
 import { SignOutButton } from '@/components/auth/SignOutButton';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
-import { LogIn, Menu } from 'lucide-react'; // Added Menu icon
+import { LogIn, Menu } from 'lucide-react'; 
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { ThemeToggle } from './ThemeToggle';
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet'; // Added Sheet components
-import { Navigation } from './Navigation'; // Navigation will be used in the Sheet
+import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet'; 
+import { Navigation } from './Navigation'; 
 
 export function Header() {
   const { user, loading } = useAuth();
@@ -26,7 +26,8 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="mr-2 md:hidden"> {/* Show on mobile/tablet, hide on md and up */}
+              {/* Removed md:hidden to make hamburger menu always visible */}
+              <Button variant="outline" size="icon" className="mr-2"> 
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">Open navigation menu</span>
               </Button>
@@ -49,9 +50,6 @@ export function Header() {
         </div>
         
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className="hidden md:flex"> {/* Navigation for desktop - can be kept if desired, or fully rely on Sheet */}
-             {/* <Navigation /> */} {/* If you want persistent nav on desktop, uncomment and style appropriately */}
-          </div>
           <ThemeToggle />
           {!loading && (
             user ? <SignOutButton /> : (

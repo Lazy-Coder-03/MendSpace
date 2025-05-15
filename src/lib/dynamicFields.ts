@@ -1,5 +1,6 @@
+"use client";
+
 // src/lib/dynamicFields.ts
-'use server';
 
 export const getOtherPerson = (name?: string | null): string => {
   if (!name) return 'Other';

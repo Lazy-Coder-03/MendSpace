@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { User } from 'firebase/auth';
@@ -94,14 +95,8 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
     signOut,
   }), [user, loading, isAllowedUser]);
 
-  if (loading && typeof window !== 'undefined' && window.location.pathname !== '/signin') {
-    // Show a full-page loader if not on the sign-in page and loading auth state
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-12 w-12 animate-spin text-primary" />
-      </div>
-    );
-  }
+  // The conditional loader that was here was causing hydration issues.
+  // Loading states are now handled by AuthGuard and specific pages like RootPage.
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

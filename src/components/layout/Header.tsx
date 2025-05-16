@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Navigation } from './Navigation';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation'; // Added usePathname
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from '@/lib/utils';
 import {
@@ -33,6 +33,7 @@ export function Header() {
   const { user, loading, signOut } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const router = useRouter();
+  // const pathname = usePathname(); // Not strictly needed if we show avatar dropdown on all auth pages
 
   // Easter egg state
   const [logoClickCount, setLogoClickCount] = useState(0);
@@ -45,7 +46,7 @@ export function Header() {
   };
 
   const handleLogoClick = (event: React.MouseEvent) => {
-    if (easterEggActive) { // If easter egg is already running, prevent further clicks/navigation
+    if (easterEggActive) { 
       event.preventDefault();
       return;
     }
@@ -54,7 +55,7 @@ export function Header() {
     setLogoClickCount(newClickCount);
 
     if (newClickCount >= 5) {
-      event.preventDefault(); // Prevent navigation to /home
+      event.preventDefault(); 
       setEasterEggActive(true);
       setShowRedirectMessage(true);
       setCountdown(5);
@@ -69,7 +70,6 @@ export function Header() {
       }, 1000);
     } else if (easterEggActive && countdown === 0) {
       router.push('https://drive.google.com/drive/folders/1QMxJFmkSkFO1egrtTD4HfeP25pTEp6SW?usp=sharing');
-      // Reset state after redirect attempt (component might unmount)
       setEasterEggActive(false);
       setShowRedirectMessage(false);
       setLogoClickCount(0); 
@@ -122,9 +122,18 @@ export function Header() {
                       Rules
                     </AccordionTrigger>
                     <AccordionContent>
-                      <p className="text-xs leading-relaxed text-accent-foreground/80">
-                        In the table given below , where you have three columns , in one side you're asked to fill up,(i) what the other person said ,(ii) what you felt ,(iii) in the defense of the other  person .  The first two columns are to be filled by one and the third column is to be filled by the other participant .  You can customise your table with any colour/font of your liking . After this is filled completely , a discussion is to be followed where both parties are given space and time to i) to feel justified or ii)talk about things that bother them .  Beside your signature , do drop an emoji of your liking .  This is to be filled at the soonest possible time convenient after a conflict of interest.
-                      </p>
+                      <div className="text-xs leading-relaxed text-accent-foreground/80 space-y-2">
+                        <p>When making an entry, you will fill out:</p>
+                        <ul className="list-disc list-inside pl-4">
+                          <li>What the other person said or did.</li>
+                          <li>What you felt in response.</li>
+                          <li>Any additional comments (optional).</li>
+                        </ul>
+                        <p>The 'In Your Defence' field is to be filled out later by the other participant when they view the entry.</p>
+                        <p>You can customise your table with any colour/font of your liking.</p>
+                        <p>After an entry is complete (both sides shared), a discussion should follow where both parties are given space and time to feel justified and talk about things that bother them.</p>
+                        <p>Entries should be made as soon as conveniently possible after a conflict or disagreement.</p>
+                      </div>
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

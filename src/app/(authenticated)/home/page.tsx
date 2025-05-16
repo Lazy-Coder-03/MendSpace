@@ -9,11 +9,6 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import type { NewSubmission } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-// Avatar related imports removed as it's moved to the header for this page
-// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-// import Image from 'next/image'; // Already present for logo if needed, but not for user avatar here
-
-// getInitials function is now in src/lib/utils.ts
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -60,12 +55,13 @@ export default function HomePage() {
     );
   }
 
+  const firstName = user.displayName?.split(' ')[0] || 'User';
+
   return (
     <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-center mb-8 space-x-3">
-          {/* Avatar removed from here, will be shown in header on this page */}
           <h1 className="text-4xl font-bold text-primary">
-              Welcome, <span className="font-semibold">{user.displayName}</span>!
+              Welcome, <span className="font-semibold">{firstName}</span>!
           </h1>
         </div>
         <p className="text-lg text-muted-foreground mb-10 text-center">

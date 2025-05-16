@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import type { Submission, EditableSubmissionFields } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button'; // Removed buttonVariants as it was causing an error and not used
+import { Button, buttonVariants } from '@/components/ui/button'; 
 import { useAuth } from '@/hooks/useAuth';
 import { EditSubmissionDialog } from './EditSubmissionDialog';
 import { Timestamp as FirestoreTimestamp, doc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
@@ -30,7 +30,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getInitials } from '@/lib/utils'; // Import getInitials from utils
+import { getInitials } from '@/lib/utils';
 
 const formatTimestamp = (timestamp: FirestoreTimestamp | undefined, label: string = "Submitted"): string => {
   if (!timestamp) return `${label}: N/A`;
@@ -50,8 +50,6 @@ const formatTimestamp = (timestamp: FirestoreTimestamp | undefined, label: strin
     return `${label}: Date Error`;
   }
 };
-
-// getInitials function is now imported from @/lib/utils
 
 
 interface SubmissionCardProps {
@@ -99,7 +97,7 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
       toast({ 
         title: 'Success', 
         description: 'Submission removed successfully.',
-        className: 'bg-green-100 border-green-400 text-green-700', // Success toast styling
+        className: 'bg-green-100 border-green-400 text-green-700',
       });
       onSubmissionUpdate(); 
     } catch (error) {
@@ -183,7 +181,7 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
           </div>
           <div>
             <strong className="flex items-center"><Shield className="h-4 w-4 mr-2 text-primary/80" />{getField3DisplayLabel(authorName)}:</strong> 
-            <p className="text-foreground/80 pl-6 mt-1 whitespace-pre-wrap break-words">{submission.field3}</p>
+            <p className="text-foreground/80 pl-6 mt-1 whitespace-pre-wrap break-words">{submission.field3 || 'N/A'}</p>
           </div>
           {submission.comments && (
             <div className="pt-2">

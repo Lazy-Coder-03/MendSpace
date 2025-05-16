@@ -23,7 +23,7 @@ import {
 const formSchema = z.object({
   field1: z.string().min(1, 'This field is required.'),
   field2: z.string().min(1, 'This field is required.'),
-  field3: z.string().min(1, 'This field is required.'),
+  field3: z.string().optional(), // Made optional
   comments: z.string().optional(),
 });
 

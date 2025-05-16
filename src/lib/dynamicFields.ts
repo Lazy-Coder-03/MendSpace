@@ -1,3 +1,4 @@
+
 "use client";
 
 // src/lib/dynamicFields.ts
@@ -16,7 +17,7 @@ export const getField1PlaceholderForm = (currentUserDisplayName?: string | null)
 export const getField2LabelForm = (): string => "What You Felt";
 export const getField2PlaceholderForm = (): string => "Describe your emotions and reactions in response.";
 
-export const getField3LabelForm = (currentUserDisplayName?: string | null): string => `In Defence of ${getOtherPerson(currentUserDisplayName)}`;
+export const getField3LabelForm = (currentUserDisplayName?: string | null): string => `In Defence of ${getOtherPerson(currentUserDisplayName)} (Optional)`;
 export const getField3PlaceholderForm = (currentUserDisplayName?: string | null): string => `Try to explain ${getOtherPerson(currentUserDisplayName)}'s perspective or actions, seeing it from their side.`;
 
 export const getCommentsLabelForm = (): string => "Comments (Optional)";

@@ -2,6 +2,7 @@
 import { initializeApp, getApps, getApp, type FirebaseOptions } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getMessaging } from 'firebase/messaging'; // Added for FCM
 
 // Validate essential environment variables
 const apiKey = process.env.NEXT_PUBLIC_FIREBASE_API_KEY;
@@ -61,6 +62,6 @@ if (!getApps().length) {
 const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
+const messaging = typeof window !== 'undefined' ? getMessaging(app) : undefined; // Initialize messaging only on client
 
-export { app, auth, db, googleProvider };
-
+export { app, auth, db, googleProvider, messaging };

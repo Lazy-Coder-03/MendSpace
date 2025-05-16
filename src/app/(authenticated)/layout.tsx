@@ -4,47 +4,58 @@
 import React, { useEffect, useRef } from 'react';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Header } from '@/components/layout/Header';
-import { useNotifications } from '@/hooks/useNotifications';
 import { useAuth } from '@/hooks/useAuth';
+import { useFCM } from '@/hooks/useFCM'; // Import useFCM
+// Firestore listener for local notifications (for when tab is active)
+// Background push notifications are handled by the service worker
 import { collection, query, where, orderBy, onSnapshot, Timestamp } from 'firebase/firestore';
 import type { Submission } from '@/lib/types';
 import { getOtherPerson } from '@/lib/dynamicFields';
+import { showLocalNotification } from '@/lib/notificationUtils';
+
 
 export default function AuthenticatedLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { requestNotificationPermission, showNotification, notificationPermission } = useNotifications();
   const { user, dbInstance } = useAuth();
+  const { requestFCMNotificationPermission, notificationPermissionStatus } = useFCM(); // Use FCM hook
+  
   const initialLoadTimeRef = useRef<Timestamp | null>(null);
   const isListenerAttachedRef = useRef(false);
 
   useEffect(() => {
-    if (user) {
-      requestNotificationPermission();
+    if (user && notificationPermissionStatus !== 'granted' && notificationPermissionStatus !== 'denied') {
+      // Only request if not already granted or denied to avoid repeated prompts
+      // or if status is null (initial)
+      requestFCMNotificationPermission();
     }
-  }, [requestNotificationPermission, user]);
+  }, [user, requestFCMNotificationPermission, notificationPermissionStatus]);
 
+
+  // This listener is for IN-APP notifications when another user acts
+  // Background push notifications are handled by firebase-messaging-sw.js
   useEffect(() => {
-    if (!user || !dbInstance || notificationPermission !== 'granted' || isListenerAttachedRef.current) {
-      if (notificationPermission !== 'granted' && notificationPermission !== null && notificationPermission !== undefined) {
-          console.log(`Notification permission is ${notificationPermission}. Listener not attached.`);
+    if (!user || !dbInstance || notificationPermissionStatus !== 'granted' || isListenerAttachedRef.current) {
+      if (notificationPermissionStatus !== 'granted' && notificationPermissionStatus !== null) {
+          console.log(`In-app notification listener not attached. Permission: ${notificationPermissionStatus}`);
       }
       return;
     }
     
     if (!initialLoadTimeRef.current) {
         initialLoadTimeRef.current = Timestamp.now();
-        console.log(`Initial load time set to: ${initialLoadTimeRef.current.toDate()}`);
     }
     
-    console.log(`Setting up notification listener. Will only react to submissions created/modified after ${initialLoadTimeRef.current.toDate()}`);
+    console.log(`Setting up in-app notification listener. Reacting to submissions created/modified after ${initialLoadTimeRef.current.toDate()}`);
 
-    // Listen for submissions created after the listener was initialized for this session.
     const q = query(
       collection(dbInstance, 'submissions'),
-      where('createdAt', '>', initialLoadTimeRef.current), 
+      // Listen to changes based on updatedAt to catch modifications
+      // If updatedAt doesn't exist, Firestore won't include docs without it in orderBy
+      // A more robust way might be to listen to all docs and filter client side,
+      // or ensure updatedAt is always set. For simplicity, using createdAt for now.
       orderBy('createdAt', 'desc') 
     );
 
@@ -52,16 +63,15 @@ export default function AuthenticatedLayout({
       snapshot.docChanges().forEach((change) => {
         const submission = { id: change.doc.id, ...change.doc.data() } as Submission;
         
-        // Double check client-side if this change is relevant (created or updated after initial load time)
         const relevantTimestamp = submission.updatedAt || submission.createdAt;
-        if (!relevantTimestamp || relevantTimestamp.toMillis() < initialLoadTimeRef.current!.toMillis()) {
-            return;
+        if (!relevantTimestamp || !initialLoadTimeRef.current || relevantTimestamp.toMillis() < initialLoadTimeRef.current!.toMillis()) {
+            return; // Ignore changes older than when the listener started for this session
         }
 
         if (change.type === 'added') {
           if (submission.uid !== user.uid) { // New submission by another user
-            console.log('New submission by other user detected:', submission);
-            showNotification(
+            console.log('New submission by other user detected (for in-app notification):', submission);
+            showLocalNotification(
               'New Mendspace Entry',
               `${submission.displayName || 'Someone'} just shared their feelings.`
             );
@@ -69,38 +79,31 @@ export default function AuthenticatedLayout({
         } else if (change.type === 'modified') {
           // If the current user is the original author of the submission,
           // and field3 (defence) is present and non-empty,
-          // assume the other person added/edited the defence.
+          // and the update was likely made by the other person.
           if (submission.uid === user.uid && submission.field3 && submission.field3.trim() !== '') {
-            // This heuristic assumes that if the user's own submission is modified and field3 is populated,
-            // it was due to the other person's action (as per UI restrictions).
-            const isRecentDefenceUpdate = submission.updatedAt && 
-                                      submission.createdAt &&
-                                      (submission.updatedAt.toMillis() > submission.createdAt.toMillis() - 5000); // Allow 5s for initial save with defence
-
-            if(isRecentDefenceUpdate || !submission.updatedAt) { // If defence was added/updated recently or if updatedAt isn't set (less likely)
-                const otherUserName = getOtherPerson(user.displayName || ''); 
-                console.log(`Defence likely updated on your submission by ${otherUserName}:`, submission);
-                showNotification(
-                    `${otherUserName} Responded`,
-                    `A defence was added/updated on your entry: "${submission.field1.substring(0, 30)}..."`
-                );
-            }
+            // This logic assumes that if field3 is modified on the user's own submission, it's by the other person.
+            // A more robust check would involve who made the last update if that data was tracked.
+            const otherUserName = getOtherPerson(user.displayName || ''); 
+            console.log(`Defence likely updated on your submission by ${otherUserName} (for in-app notification):`, submission);
+            showLocalNotification(
+                `${otherUserName} Responded`,
+                `A defence was added/updated on your entry: "${submission.field1.substring(0, 30)}..."`
+            );
           }
         }
       });
     }, (error) => {
-      console.error("Error listening to submissions for notifications:", error);
+      console.error("Error listening to submissions for in-app notifications:", error);
     });
 
     isListenerAttachedRef.current = true; 
 
     return () => {
-      console.log("Cleaning up notification listener.");
+      console.log("Cleaning up in-app notification listener.");
       unsubscribe();
       isListenerAttachedRef.current = false; 
     };
-  // Ensure getOtherPerson is stable or memoized if its definition changes frequently
-  }, [user, dbInstance, notificationPermission, showNotification, getOtherPerson]);
+  }, [user, dbInstance, notificationPermissionStatus, getOtherPerson]);
 
 
   return (

@@ -15,20 +15,24 @@ export default function HomePage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleNewSubmission = async (data: Omit<NewSubmission, 'uid' | 'displayName' | 'signature' | 'createdAt' | 'photoURL'>, signature: string) => {
+  const handleNewSubmission = async (data: Omit<NewSubmission, 'uid' | 'displayName' | 'signature' | 'createdAt' | 'photoURL' | 'field3'>, signature: string) => {
     if (!user) {
       toast({ title: 'Error', description: 'You must be logged in to submit.', variant: 'destructive' });
       return;
     }
     setIsLoading(true);
     try {
+      // field3 is intentionally omitted here as it's not part of the initial submission by the author
       const submissionData: NewSubmission = {
-        ...data,
+        field1: data.field1,
+        field2: data.field2,
+        comments: data.comments || '', // Ensure comments is an empty string if not provided
+        field3: '', // Initialize field3 as empty; to be filled by the other person
         uid: user.uid,
         displayName: user.displayName || 'Anonymous',
-        photoURL: user.photoURL || null, // Save photoURL with submission
+        photoURL: user.photoURL || null,
         signature: signature,
-        createdAt: serverTimestamp() as any, // Firestore will convert this
+        createdAt: serverTimestamp() as any, 
       };
       await addDoc(collection(db, 'submissions'), submissionData);
       toast({
@@ -67,7 +71,11 @@ export default function HomePage() {
         <p className="text-lg text-muted-foreground mb-10 text-center">
             Ready to share something new? Fill out the form below.
         </p>
-      <SubmissionForm onSubmit={handleNewSubmission} isLoading={isLoading} />
+      <SubmissionForm 
+        onSubmit={handleNewSubmission as any} // Cast as any because the form data type for new submissions won't include field3
+        isLoading={isLoading} 
+        originalAuthorDisplayName={user.displayName} // For consistency, though not strictly needed for new form
+      />
     </div>
   );
 }

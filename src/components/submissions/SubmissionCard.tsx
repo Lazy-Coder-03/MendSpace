@@ -10,13 +10,14 @@ import { EditSubmissionDialog } from './EditSubmissionDialog';
 import { Timestamp as FirestoreTimestamp, doc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import { useToast } from '@/hooks/use-toast';
-import { Edit, Trash2, CheckCircle, Clock, UserCircle, MessageSquareText, Heart, Shield, AlertTriangle } from 'lucide-react';
+import { Edit, Trash2, CheckCircle, Clock, UserCircle, MessageSquareText, Heart, Shield, AlertTriangle, Edit3 } from 'lucide-react';
 import { format } from 'date-fns';
 import { 
   getField1DisplayLabel, 
   getField2DisplayLabel, 
   getField3DisplayLabel,
-  getCommentsDisplayLabel
+  getCommentsDisplayLabel,
+  getOtherPerson
 } from '@/lib/dynamicFields';
 import {
   AlertDialog,
@@ -35,11 +36,9 @@ import { getInitials } from '@/lib/utils';
 const formatTimestamp = (timestamp: FirestoreTimestamp | undefined, label: string = "Submitted"): string => {
   if (!timestamp) return `${label}: N/A`;
   try {
-    // Ensure timestamp is a valid Firestore Timestamp-like object
     if (timestamp && typeof timestamp.toDate === 'function') {
       return `${label}: ${format(timestamp.toDate(), 'MMM d, yyyy HH:mm')}`;
     }
-    // Fallback for potentially already converted dates or different timestamp structures
     if (timestamp instanceof Date) {
       return `${label}: ${format(timestamp, 'MMM d, yyyy HH:mm')}`;
     }
@@ -64,17 +63,40 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
-  const canEditOrDelete = user?.uid === submission.uid;
   const authorName = submission.displayName || submission.signature;
+  
+  const isCurrentUserAuthor = user?.uid === submission.uid;
+  const otherPersonForThisSubmission = getOtherPerson(authorName);
+  const isCurrentUserTheOtherPerson = user?.displayName?.toLowerCase().startsWith(otherPersonForThisSubmission.toLowerCase());
+
+  // User can "edit" if they are the author OR if they are the "other person" (to add/edit defence)
+  const canOpenEditDialog = isCurrentUserAuthor || (isCurrentUserTheOtherPerson && user?.uid !== submission.uid);
+  const canDelete = isCurrentUserAuthor; // Only original author can delete
+
 
   const handleSaveEdit = async (submissionId: string, data: EditableSubmissionFields) => {
     setIsSaving(true);
     try {
       const submissionRef = doc(db, 'submissions', submissionId);
-      await updateDoc(submissionRef, {
-        ...data,
+      const dataToUpdate: Partial<Submission> = {
         updatedAt: serverTimestamp() as any,
-      });
+      };
+
+      if (isCurrentUserAuthor) {
+        dataToUpdate.field1 = data.field1;
+        dataToUpdate.field2 = data.field2;
+        dataToUpdate.comments = data.comments;
+        // Author does not edit field3 in this flow
+      } else if (isCurrentUserTheOtherPerson && user?.uid !== submission.uid) {
+        dataToUpdate.field3 = data.field3;
+        // Other person only edits field3
+      } else {
+        toast({ title: 'Error', description: 'You do not have permission to save these changes.', variant: 'destructive' });
+        setIsSaving(false);
+        return;
+      }
+
+      await updateDoc(submissionRef, dataToUpdate);
       toast({ 
         title: 'Success', 
         description: 'Submission updated successfully.',
@@ -91,6 +113,10 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
   };
 
   const handleDeleteConfirm = async () => {
+    if (!canDelete) {
+      toast({ title: 'Error', description: 'You do not have permission to delete this submission.', variant: 'destructive' });
+      return;
+    }
     setIsDeleting(true);
     try {
       await deleteDoc(doc(db, 'submissions', submission.id));
@@ -122,12 +148,14 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
                 Entry by {authorName}
               </CardTitle>
             </div>
-            {canEditOrDelete && (
-              <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-1">
+              {canOpenEditDialog && (
                 <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)} className="text-primary hover:text-accent-foreground hover:bg-accent">
-                  <Edit className="h-5 w-5" />
-                  <span className="sr-only">Edit Submission</span>
+                  <Edit3 className="h-5 w-5" /> {/* Changed icon to Edit3 for variety */}
+                  <span className="sr-only">Edit or Add Defence</span>
                 </Button>
+              )}
+              {canDelete && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant="ghost" size="icon" className="text-destructive/70 hover:text-destructive hover:bg-destructive/10">
@@ -161,8 +189,8 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-              </div>
-            )}
+              )}
+            </div>
           </div>
           <CardDescription className="text-xs text-muted-foreground flex items-center space-x-4 pt-1 mt-2">
             <span><UserCircle className="inline-block mr-1 h-4 w-4" />UID: {submission.uid.substring(0,8)}...</span>
@@ -179,10 +207,12 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
             <strong className="flex items-center"><Heart className="h-4 w-4 mr-2 text-primary/80" />{getField2DisplayLabel(authorName)}:</strong> 
             <p className="text-foreground/80 pl-6 mt-1 whitespace-pre-wrap break-words">{submission.field2}</p>
           </div>
-          <div>
-            <strong className="flex items-center"><Shield className="h-4 w-4 mr-2 text-primary/80" />{getField3DisplayLabel(authorName)}:</strong> 
-            <p className="text-foreground/80 pl-6 mt-1 whitespace-pre-wrap break-words">{submission.field3 || 'N/A'}</p>
-          </div>
+          { (submission.field3 || (isCurrentUserTheOtherPerson && user?.uid !== submission.uid)) && ( // Show if field3 has content OR if current user is other person (to prompt adding defence)
+            <div>
+              <strong className="flex items-center"><Shield className="h-4 w-4 mr-2 text-primary/80" />{getField3DisplayLabel(authorName)}:</strong> 
+              <p className="text-foreground/80 pl-6 mt-1 whitespace-pre-wrap break-words">{submission.field3 || (isCurrentUserTheOtherPerson ? '(You can add your defence by clicking edit)' : 'N/A')}</p>
+            </div>
+          )}
           {submission.comments && (
             <div className="pt-2">
               <strong className="block mb-1">{getCommentsDisplayLabel()}:</strong>
@@ -192,12 +222,12 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
         </CardContent>
       </Card>
 
-      {canEditOrDelete && (
+      {canOpenEditDialog && (
         <EditSubmissionDialog
           submission={submission}
           isOpen={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
-          onSave={(id, data) => handleSaveEdit(id, data, submission.signature)} 
+          onSave={(id, data) => handleSaveEdit(id, data, user?.displayName || '')} 
           isLoading={isSaving}
         />
       )}

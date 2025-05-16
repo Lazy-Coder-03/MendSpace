@@ -12,18 +12,18 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
 import type { EditableSubmissionFields } from '@/lib/types';
-import { Loader2, Send } from 'lucide-react';
+import { Loader2, Send, Edit3, ShieldCheck } from 'lucide-react';
 import { 
   getField1LabelForm, getField1PlaceholderForm,
   getField2LabelForm, getField2PlaceholderForm,
-  getField3LabelForm, getField3PlaceholderForm,
+  getField3LabelForm_Edit, getField3PlaceholderForm_Edit,
   getCommentsLabelForm, getCommentsPlaceholderForm
 } from '@/lib/dynamicFields';
 
 const formSchema = z.object({
   field1: z.string().min(1, 'This field is required.'),
   field2: z.string().min(1, 'This field is required.'),
-  field3: z.string().optional(), // Made optional
+  field3: z.string().optional(), // Remains optional in schema, controlled by form logic
   comments: z.string().optional(),
 });
 
@@ -34,9 +34,18 @@ interface SubmissionFormProps {
   initialData?: EditableSubmissionFields;
   isEditing?: boolean;
   isLoading?: boolean;
+  originalAuthorUid?: string; // UID of the person who originally created the submission
+  originalAuthorDisplayName?: string | null; // Display name of original author
 }
 
-export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoading = false }: SubmissionFormProps) {
+export function SubmissionForm({ 
+  onSubmit, 
+  initialData, 
+  isEditing = false, 
+  isLoading = false,
+  originalAuthorUid,
+  originalAuthorDisplayName
+}: SubmissionFormProps) {
   const { user } = useAuth();
 
   const form = useForm<SubmissionFormValues>({
@@ -61,31 +70,45 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
       console.error("User not available for submission");
       return;
     }
-    await onSubmit(values, user.displayName);
-    if (!isEditing) {
-      form.reset(); 
+    await onSubmit(values, user.displayName); // Pass current user's signature
+    if (!isEditing) { // Only reset form if it's a new submission
+      form.reset({ field1: '', field2: '', field3: '', comments: '' }); 
     }
   };
 
-  // Determine if the form is inside the blue dialog based on isEditing (a proxy for dialog context)
-  // This could be made more robust with a dedicated prop if needed.
   const inDialog = isEditing; 
+  const isCurrentUserAuthor = isEditing && user?.uid === originalAuthorUid;
+  const canEditMainFields = !isEditing || (isEditing && isCurrentUserAuthor);
+  const canEditDefenceField = isEditing && !isCurrentUserAuthor;
 
   const labelClasses = inDialog ? "text-neutral-700" : "text-foreground/90";
-  const textInputClasses = inDialog 
-    ? "bg-white min-h-[100px] border-2 border-black text-black placeholder:text-neutral-500 focus-visible:ring-neutral-400" 
-    : "bg-input min-h-[100px]";
+  const getTextInputClasses = (isDisabled: boolean) => 
+    cn(
+      inDialog 
+        ? "bg-white min-h-[100px] border-2 border-black text-black placeholder:text-neutral-500 focus-visible:ring-neutral-400" 
+        : "bg-input min-h-[100px]",
+      isDisabled && "opacity-70 cursor-not-allowed bg-neutral-100 dark:bg-neutral-800"
+    );
+    
   const signatureInputClasses = inDialog
     ? "bg-neutral-100 cursor-not-allowed border-2 border-black text-black opacity-70 focus-visible:ring-neutral-400"
     : "bg-muted/50 cursor-not-allowed";
 
+  let submitButtonText = isEditing ? 'Update Submission' : 'Submit Entry';
+  let SubmitIcon = isEditing ? Edit3 : Send;
+
+  if (isEditing && !isCurrentUserAuthor) {
+    submitButtonText = 'Save Defence';
+    SubmitIcon = ShieldCheck;
+  }
+
 
   return (
     <Card className={`w-full shadow-xl ${inDialog ? 'bg-transparent border-0 shadow-none' : 'bg-card/90 backdrop-blur-sm'}`}>
-      {!inDialog && (
+      {!inDialog && ( // Only show this header for new submissions on the home page
         <CardHeader>
-          <CardTitle className="text-2xl text-primary">{isEditing ? 'Edit Submission' : 'New Submission'}</CardTitle>
-          <CardDescription className="text-muted-foreground">{isEditing ? 'Update your entry details below.' : 'Fill in the details for your new submission.'}</CardDescription>
+          <CardTitle className="text-2xl text-primary">New Submission</CardTitle>
+          <CardDescription className="text-muted-foreground">Fill in the details for your new submission.</CardDescription>
         </CardHeader>
       )}
       <CardContent className={inDialog ? 'p-0' : ''}>
@@ -96,9 +119,14 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               name="field1"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className={labelClasses}>{getField1LabelForm(user?.displayName)}</FormLabel>
+                  <FormLabel className={labelClasses}>{getField1LabelForm(originalAuthorDisplayName || user?.displayName)}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={getField1PlaceholderForm(user?.displayName)} {...field} className={textInputClasses}/>
+                    <Textarea 
+                      placeholder={getField1PlaceholderForm(originalAuthorDisplayName || user?.displayName)} 
+                      {...field} 
+                      className={getTextInputClasses(!canEditMainFields)}
+                      disabled={!canEditMainFields}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -111,25 +139,41 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
                 <FormItem>
                   <FormLabel className={labelClasses}>{getField2LabelForm()}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={getField2PlaceholderForm()} {...field} className={textInputClasses}/>
+                    <Textarea 
+                      placeholder={getField2PlaceholderForm()} 
+                      {...field} 
+                      className={getTextInputClasses(!canEditMainFields)}
+                      disabled={!canEditMainFields}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="field3"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className={labelClasses}>{getField3LabelForm(user?.displayName)}</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder={getField3PlaceholderForm(user?.displayName)} {...field} className={textInputClasses}/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            
+            {isEditing && ( // Only show Field 3 if editing
+              <FormField
+                control={form.control}
+                name="field3"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className={labelClasses}>
+                      {getField3LabelForm_Edit(isCurrentUserAuthor, originalAuthorDisplayName, user?.displayName)}
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder={getField3PlaceholderForm_Edit(isCurrentUserAuthor, originalAuthorDisplayName)} 
+                        {...field} 
+                        className={getTextInputClasses(!canEditDefenceField)} // Enabled if current user is NOT author
+                        disabled={!canEditDefenceField} // Enabled if current user is NOT author
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+
             <FormField
               control={form.control}
               name="comments"
@@ -137,16 +181,27 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
                 <FormItem>
                   <FormLabel className={labelClasses}>{getCommentsLabelForm()}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder={getCommentsPlaceholderForm()} {...field} className={textInputClasses}/>
+                    <Textarea 
+                      placeholder={getCommentsPlaceholderForm()} 
+                      {...field} 
+                      className={getTextInputClasses(!canEditMainFields)}
+                      disabled={!canEditMainFields}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormItem>
-              <FormLabel className={labelClasses}>Signature</FormLabel>
-              <Input value={user?.displayName || 'Loading...'} readOnly disabled className={signatureInputClasses} />
+              <FormLabel className={labelClasses}>{isEditing ? "Entry by" : "Signature"}</FormLabel>
+              <Input 
+                value={isEditing ? (originalAuthorDisplayName || 'Loading...') : (user?.displayName || 'Loading...')} 
+                readOnly 
+                disabled 
+                className={signatureInputClasses} />
             </FormItem>
+            
             <Button 
               type="submit" 
               variant="default" 
@@ -156,9 +211,9 @@ export function SubmissionForm({ onSubmit, initialData, isEditing = false, isLoa
               {isLoading ? (
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               ) : (
-                <Send className="mr-2 h-5 w-5" />
+                <SubmitIcon className="mr-2 h-5 w-5" />
               )}
-              {isLoading ? (isEditing ? 'Updating...' : 'Submitting...') : (isEditing ? 'Update Submission' : 'Submit Entry')}
+              {isLoading ? (isEditing ? (isCurrentUserAuthor ? 'Updating...' : 'Saving Defence...') : 'Submitting...') : submitButtonText}
             </Button>
           </form>
         </Form>

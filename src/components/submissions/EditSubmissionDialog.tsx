@@ -5,7 +5,9 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { SubmissionForm } from './SubmissionForm';
 import type { Submission, EditableSubmissionFields } from '@/lib/types';
-// Removed DialogFooter, DialogClose, Button as they are not used directly here anymore
+import { useAuth } from '@/hooks/useAuth';
+import { getOtherPerson } from '@/lib/dynamicFields';
+
 
 interface EditSubmissionDialogProps {
   submission: Submission;
@@ -16,6 +18,7 @@ interface EditSubmissionDialogProps {
 }
 
 export function EditSubmissionDialog({ submission, isOpen, onOpenChange, onSave, isLoading }: EditSubmissionDialogProps) {
+  const { user } = useAuth();
   
   const handleFormSubmit = async (data: EditableSubmissionFields, signature: string) => {
     await onSave(submission.id, data, signature);
@@ -29,13 +32,29 @@ export function EditSubmissionDialog({ submission, isOpen, onOpenChange, onSave,
     comments: submission.comments,
   };
 
+  const isCurrentUserAuthor = user?.uid === submission.uid;
+  const originalAuthorName = submission.displayName || submission.signature;
+  const otherPersonName = getOtherPerson(originalAuthorName);
+
+  let dialogTitle = "Edit Entry";
+  let dialogDescription = "Make changes to the entry.";
+
+  if (isCurrentUserAuthor) {
+    dialogTitle = "Edit Your Submission";
+    dialogDescription = `Update your statements and comments. ${otherPersonName}'s defence will be read-only.`;
+  } else {
+    dialogTitle = `Add/Edit Defence for ${originalAuthorName}`;
+    dialogDescription = `You are adding or editing the defence for ${originalAuthorName}'s entry. Other fields are read-only.`;
+  }
+
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-blue-200 border-border max-h-[85vh] overflow-y-auto"> {/* Changed background to pastel blue and made scrollable */}
+      <DialogContent className="sm:max-w-[600px] bg-blue-200 border-border max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-black">Edit Submission</DialogTitle> {/* Black text for title */}
-          <DialogDescription className="text-black"> {/* Black text for description */}
-            Make changes to your submission. Fields like signature and original timestamp will remain unchanged.
+          <DialogTitle className="text-black">{dialogTitle}</DialogTitle>
+          <DialogDescription className="text-black">
+            {dialogDescription}
           </DialogDescription>
         </DialogHeader>
         
@@ -44,9 +63,10 @@ export function EditSubmissionDialog({ submission, isOpen, onOpenChange, onSave,
           initialData={initialData} 
           isEditing={true}
           isLoading={isLoading}
+          originalAuthorUid={submission.uid}
+          originalAuthorDisplayName={originalAuthorName}
         />
       </DialogContent>
     </Dialog>
   );
 }
-

@@ -5,20 +5,44 @@
 
 export const getOtherPerson = (name?: string | null): string => {
   if (!name) return 'Other';
-  if (name.toLowerCase().startsWith('sayantan')) return 'Ashmi';
-  if (name.toLowerCase().startsWith('ashmi')) return 'Sayantan';
+  const lowerName = name.toLowerCase();
+  if (lowerName.startsWith('sayantan')) return 'Ashmi';
+  if (lowerName.startsWith('ashmi')) return 'Sayantan';
   return 'Other'; // Fallback
 };
 
-// For SubmissionForm (context: current logged-in user)
+// For SubmissionForm (context: current logged-in user creating a new submission)
 export const getField1LabelForm = (currentUserDisplayName?: string | null): string => `What ${getOtherPerson(currentUserDisplayName)} Said`;
 export const getField1PlaceholderForm = (currentUserDisplayName?: string | null): string => `Describe what ${getOtherPerson(currentUserDisplayName)} stated or did.`;
 
 export const getField2LabelForm = (): string => "What You Felt";
 export const getField2PlaceholderForm = (): string => "Describe your emotions and reactions in response.";
 
-export const getField3LabelForm = (currentUserDisplayName?: string | null): string => `In Defence of ${getOtherPerson(currentUserDisplayName)} (Optional)`;
-export const getField3PlaceholderForm = (currentUserDisplayName?: string | null): string => `Try to explain ${getOtherPerson(currentUserDisplayName)}'s perspective or actions, seeing it from their side.`;
+// For SubmissionForm (context: editing an existing submission)
+export const getField3LabelForm_Edit = (
+  isCurrentUserAuthor: boolean,
+  originalAuthorDisplayName?: string | null,
+  currentUserDisplayName?: string | null
+): string => {
+  if (isCurrentUserAuthor) {
+    // Author is viewing/editing their submission, field3 is for the other person's defence
+    return `Defence by ${getOtherPerson(originalAuthorDisplayName)} (View Only)`;
+  } else {
+    // The "other person" is editing, adding their defence for the original author
+    return `Your Defence of ${originalAuthorDisplayName || 'them'}`;
+  }
+};
+export const getField3PlaceholderForm_Edit = (
+  isCurrentUserAuthor: boolean,
+  originalAuthorDisplayName?: string | null
+): string => {
+  if (isCurrentUserAuthor) {
+    return `This field is for ${getOtherPerson(originalAuthorDisplayName)} to fill.`;
+  } else {
+    return `Explain ${originalAuthorDisplayName || 'their'} perspective or actions, seeing it from their side.`;
+  }
+};
+
 
 export const getCommentsLabelForm = (): string => "Comments (Optional)";
 export const getCommentsPlaceholderForm = (): string => "Any additional thoughts, context, or reflections?";
@@ -27,5 +51,6 @@ export const getCommentsPlaceholderForm = (): string => "Any additional thoughts
 // For SubmissionCard and SubmissionsTable (context: the author of the submission)
 export const getField1DisplayLabel = (submissionAuthorName?: string | null): string => `What ${getOtherPerson(submissionAuthorName)} Said`;
 export const getField2DisplayLabel = (submissionAuthorName?: string | null): string => `What ${submissionAuthorName || 'They'} Felt`;
-export const getField3DisplayLabel = (submissionAuthorName?: string |null): string => `In Defence of ${getOtherPerson(submissionAuthorName)}`;
+export const getField3DisplayLabel = (submissionAuthorName?: string |null): string => `In Defence of ${submissionAuthorName || 'Them'}`; // Displayed on card, defence is for the author
 export const getCommentsDisplayLabel = (): string => "Comments";
+

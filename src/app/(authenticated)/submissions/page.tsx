@@ -202,12 +202,12 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
- <TableHead className="text-center border-r px-2 py-3 min-w-[40px]">#</TableHead>
- <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[100px] max-w-[200px]">{getField1DisplayLabel(participantFirstName)}</TableHead>
- <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[100px] max-w-[200px]">{getField2DisplayLabel(participantFirstName)}</TableHead>
- <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[100px] max-w-[200px]">{getField3DisplayLabel(participantFirstName)}</TableHead>
- <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[100px] max-w-[200px]">{getCommentsDisplayLabel()}</TableHead>
- <TableHead className="px-2 py-3 whitespace-pre-wrap break-words min-w-[150px]">Timestamp</TableHead>
+ <TableHead className="text-center border-r px-2 py-3 min-w-[50px]">#</TableHead>
+ <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[150px] max-w-[250px]">{getField1DisplayLabel(participantFirstName)}</TableHead>
+ <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[150px] max-w-[250px]">{getField2DisplayLabel(participantFirstName)}</TableHead>
+ <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[150px] max-w-[250px]">{getField3DisplayLabel(participantFirstName)}</TableHead>
+ <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[150px] max-w-[250px]">{getCommentsDisplayLabel()}</TableHead>
+ <TableHead className="px-2 py-3 whitespace-pre-wrap break-words min-w-[160px]">Timestamp</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -220,9 +220,9 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
 
                   return (
                     <TableRow key={sub.id} className="hover:bg-accent/50">
-                      <TableCell className="text-center font-medium border-r px-2 py-3">{index + 1}</TableCell>
-                      <TableCell className="font-medium whitespace-pre-wrap break-words border-r px-2 py-3">{sub.field1 || 'N/A'}</TableCell>
-                      <TableCell className="whitespace-pre-wrap break-words border-r px-2 py-3">{sub.field2 || 'N/A'}</TableCell>
+                      <TableCell className="text-center font-medium border-r px-2 py-3 min-w-[50px]">{index + 1}</TableCell>
+                      <TableCell className="font-medium whitespace-pre-wrap break-words border-r px-2 py-3 min-w-[150px] max-w-[250px]">{sub.field1 || 'N/A'}</TableCell>
+                      <TableCell className="whitespace-pre-wrap break-words border-r px-2 py-3 min-w-[150px] max-w-[250px]">{sub.field2 || 'N/A'}</TableCell>
                       <TableCell
                         className={cn(
                           "whitespace-pre-wrap break-words border-r px-2 py-3",
@@ -242,8 +242,8 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
                       >
                         {sub.field3 || (isCurrentUserTheOtherPerson ? '(Click to add defence)' : 'N/A')}
                       </TableCell>
-                      <TableCell className="whitespace-pre-wrap break-words border-r px-2 py-3">{sub.comments || 'N/A'}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground whitespace-pre-wrap break-words px-2 py-3">{formatTimestamp(sub.createdAt)}</TableCell>
+                      <TableCell className="whitespace-pre-wrap break-words border-r px-2 py-3 min-w-[150px] max-w-[250px]">{sub.comments || 'N/A'}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground whitespace-pre-wrap break-words px-2 py-3 min-w-[160px]">{formatTimestamp(sub.createdAt)}</TableCell>
                     </TableRow>
                   );
                 })}

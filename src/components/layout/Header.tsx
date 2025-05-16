@@ -34,17 +34,18 @@ export function Header() {
   return (
     <header className="bg-card/80 backdrop-blur-md shadow-md sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-20">
-        <div className="flex items-center gap-2">
+        {/* Left: Hamburger Menu */}
+        <div className="flex-shrink-0">
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="mr-2">
+              <Button variant="outline" size="icon">
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">Open navigation menu</span>
               </Button>
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)]" // Solid dark pastel lavender
+              className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)]"
             >
               <SheetHeader className="p-4 pb-2 border-b border-[hsl(270,60%,65%)]">
                 <SheetTitle className="text-accent-foreground">Menu</SheetTitle>
@@ -58,14 +59,19 @@ export function Header() {
               </div>
             </SheetContent>
           </Sheet>
+        </div>
 
+        {/* Center: Logo and App Name */}
+        <div className="flex-1 flex justify-center">
           <Link href="/home" className="flex items-center gap-2 text-3xl font-bold text-primary hover:text-primary/80 transition-colors">
             <Image src="/logo.png" alt="Mendspace Logo" width={49} height={40} priority data-ai-hint="monogram letter M" />
-            <span className="hidden sm:inline">Mendspace</span>
+            {/* "Mendspace" text is now always visible */}
+            <span>Mendspace</span>
           </Link>
         </div>
 
-        <div className="flex items-center gap-3 sm:gap-4">
+        {/* Right: User Actions */}
+        <div className="flex-shrink-0 flex items-center gap-3 sm:gap-4">
           {!loading && user ? (
             pathname === '/home' ? (
               <DropdownMenu>

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Navigation } from './Navigation';
-import { useRouter } from 'next/navigation'; // usePathname removed as it's no longer needed for this logic
+import { useRouter, usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from '@/lib/utils';
 import {
@@ -20,13 +20,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-// SignOutButton import is removed as it's replaced by the DropdownMenu
-// import { SignOutButton } from '@/components/auth/SignOutButton'; 
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 
 export function Header() {
   const { user, loading, signOut } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   // Easter egg state
   const [logoClickCount, setLogoClickCount] = useState(0);
@@ -86,7 +87,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)]" // Solid dark pastel lavender
+              className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)] flex flex-col" 
             >
               <SheetHeader className="p-4 pb-2 border-b border-[hsl(270,60%,65%)]">
                 <SheetTitle className="text-accent-foreground">Menu</SheetTitle>
@@ -98,6 +99,23 @@ export function Header() {
                   </Link>
                 <Navigation onLinkClick={handleLinkClick} />
               </div>
+              <Separator className="my-2 bg-[hsl(270,60%,65%)]" />
+              <ScrollArea className="flex-grow p-4 overflow-y-auto">
+                <div className="text-sm text-accent-foreground/90 space-y-4">
+                  <div>
+                    <h3 className="font-semibold text-md mb-1">Terms and Conditions:</h3>
+                    <p className="text-xs leading-relaxed">
+                      The parties involved do not intend on attack or blame or to defend , they just intend on vocalising their feelings. They intend on feeling heard , and their needs being met . Anybody’s feeling is not to be taken as an attack , as it is not, it's merely an unmet need.  Refrain from trying to fix your language or feeling, anything you feel is something you write .  Use of any language, to fill this is allowed . Both parties are required to fill this up after every argument/disagreement because they love each other and are willing to make this work.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-md mb-1">Rules:</h3>
+                    <p className="text-xs leading-relaxed">
+                      In the table given below , where you have three columns , in one side you're asked to fill up,(i) what the other person said ,(ii) what you felt ,(iii) in the defense of the other  person .  The first two columns are to be filled by one and the third column is to be filled by the other participant .  You can customise your table with any colour/font of your liking . After this is filled completely , a discussion is to be followed where both parties are given space and time to i) to feel justified or ii)talk about things that bother them .  Beside your signature , do drop an emoji of your liking .  This is to be filled at the soonest possible time convenient after a conflict of interest.
+                    </p>
+                  </div>
+                </div>
+              </ScrollArea>
             </SheetContent>
           </Sheet>
         </div>

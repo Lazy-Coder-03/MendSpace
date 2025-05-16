@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import type { Submission, EditableSubmissionFields } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button'; // Removed buttonVariants as it was causing an error and not used
 import { useAuth } from '@/hooks/useAuth';
 import { EditSubmissionDialog } from './EditSubmissionDialog';
 import { Timestamp as FirestoreTimestamp, doc, updateDoc, serverTimestamp, deleteDoc } from 'firebase/firestore';
@@ -30,6 +30,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getInitials } from '@/lib/utils'; // Import getInitials from utils
 
 const formatTimestamp = (timestamp: FirestoreTimestamp | undefined, label: string = "Submitted"): string => {
   if (!timestamp) return `${label}: N/A`;
@@ -50,15 +51,7 @@ const formatTimestamp = (timestamp: FirestoreTimestamp | undefined, label: strin
   }
 };
 
-const getInitials = (name: string | null | undefined) => {
-  if (!name) return '';
-  const names = name.split(' ');
-  let initials = names[0].substring(0, 1).toUpperCase();
-  if (names.length > 1) {
-    initials += names[names.length - 1].substring(0, 1).toUpperCase();
-  }
-  return initials;
-};
+// getInitials function is now imported from @/lib/utils
 
 
 interface SubmissionCardProps {
@@ -106,10 +99,9 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
       toast({ 
         title: 'Success', 
         description: 'Submission removed successfully.',
-        className: 'bg-green-100 border-green-400 text-green-700',
+        className: 'bg-green-100 border-green-400 text-green-700', // Success toast styling
       });
-      onSubmissionUpdate(); // Refresh the list
-      // AlertDialog will close itself via its cancel/action buttons or onOpenChange
+      onSubmissionUpdate(); 
     } catch (error) {
       console.error('Error removing submission: ', error);
       toast({ title: 'Error', description: 'Failed to remove submission.', variant: 'destructive' });

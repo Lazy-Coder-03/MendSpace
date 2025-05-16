@@ -9,18 +9,11 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import type { NewSubmission } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Image from 'next/image';
+// Avatar related imports removed as it's moved to the header for this page
+// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+// import Image from 'next/image'; // Already present for logo if needed, but not for user avatar here
 
-const getInitials = (name: string | null | undefined) => {
-  if (!name) return '';
-  const names = name.split(' ');
-  let initials = names[0].substring(0, 1).toUpperCase();
-  if (names.length > 1) {
-    initials += names[names.length - 1].substring(0, 1).toUpperCase();
-  }
-  return initials;
-};
+// getInitials function is now in src/lib/utils.ts
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -38,7 +31,7 @@ export default function HomePage() {
         ...data,
         uid: user.uid,
         displayName: user.displayName || 'Anonymous',
-        photoURL: user.photoURL || null,
+        photoURL: user.photoURL || null, // Save photoURL with submission
         signature: signature,
         createdAt: serverTimestamp() as any, // Firestore will convert this
       };
@@ -70,10 +63,7 @@ export default function HomePage() {
   return (
     <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-center mb-8 space-x-3">
-          <Avatar className="h-16 w-16 border-2 border-primary/50 shadow-md">
-            <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User'} />
-            <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
-          </Avatar>
+          {/* Avatar removed from here, will be shown in header on this page */}
           <h1 className="text-4xl font-bold text-primary">
               Welcome, <span className="font-semibold">{user.displayName}</span>!
           </h1>

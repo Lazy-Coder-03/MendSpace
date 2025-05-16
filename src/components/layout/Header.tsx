@@ -10,10 +10,14 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet'; 
 import { Navigation } from './Navigation'; 
+import { usePathname } from 'next/navigation';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getInitials } from '@/lib/utils';
 
 export function Header() {
   const { user, loading } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const pathname = usePathname();
 
   const handleLinkClick = () => {
     setIsSheetOpen(false);
@@ -32,10 +36,10 @@ export function Header() {
             </SheetTrigger>
             <SheetContent 
               side="left" 
-              className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)]" // Solid dark pastel lavender
+              className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)]"
             >
               <SheetHeader className="p-4 pb-2 border-b border-[hsl(270,60%,65%)]">
-                <SheetTitle className="text-accent-foreground">Menu</SheetTitle> {/* Darker text for contrast */}
+                <SheetTitle className="text-accent-foreground">Menu</SheetTitle> 
               </SheetHeader>
               <div className="p-4">
                  <Link href="/home" className="flex items-center gap-2 text-2xl font-bold text-primary hover:text-primary/80 transition-colors mb-6" onClick={handleLinkClick}>
@@ -54,18 +58,31 @@ export function Header() {
         </div>
         
         <div className="flex items-center gap-3 sm:gap-4">
-          {!loading && (
-            user ? <SignOutButton /> : (
-              <Button asChild variant="outline" className="shadow-sm hover:shadow-md">
-                <Link href="/signin">
-                  <LogIn className="mr-2 h-4 w-4" /> Sign In
-                </Link>
-              </Button>
-            )
+          {!loading && user && (
+            <>
+              {pathname === '/home' && user.photoURL && (
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user.photoURL} alt={user.displayName || 'User'} />
+                  <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
+                </Avatar>
+              )}
+               {pathname === '/home' && !user.photoURL && (
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
+                </Avatar>
+              )}
+              <SignOutButton />
+            </>
+          )}
+          {!loading && !user && (
+            <Button asChild variant="outline" className="shadow-sm hover:shadow-md">
+              <Link href="/signin">
+                <LogIn className="mr-2 h-4 w-4" /> Sign In
+              </Link>
+            </Button>
           )}
         </div>
       </div>
     </header>
   );
 }
-

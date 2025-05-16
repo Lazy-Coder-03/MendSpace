@@ -5,17 +5,25 @@ import React, { useState } from 'react';
 import { SignOutButton } from '@/components/auth/SignOutButton';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
-import { LogIn, Menu } from 'lucide-react'; 
+import { LogIn, Menu, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet'; 
-import { Navigation } from './Navigation'; 
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Navigation } from './Navigation';
 import { usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Header() {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const pathname = usePathname();
 
@@ -29,17 +37,17 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="mr-2"> 
+              <Button variant="outline" size="icon" className="mr-2">
                 <Menu className="h-6 w-6" />
                 <span className="sr-only">Open navigation menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent 
-              side="left" 
+            <SheetContent
+              side="left"
               className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)]"
             >
               <SheetHeader className="p-4 pb-2 border-b border-[hsl(270,60%,65%)]">
-                <SheetTitle className="text-accent-foreground">Menu</SheetTitle> 
+                <SheetTitle className="text-accent-foreground">Menu</SheetTitle>
               </SheetHeader>
               <div className="p-4">
                  <Link href="/home" className="flex items-center gap-2 text-2xl font-bold text-primary hover:text-primary/80 transition-colors mb-6" onClick={handleLinkClick}>
@@ -56,24 +64,43 @@ export function Header() {
             <span className="hidden sm:inline">Mendspace</span>
           </Link>
         </div>
-        
+
         <div className="flex items-center gap-3 sm:gap-4">
-          {!loading && user && (
-            <>
-              {pathname === '/home' && user.photoURL && (
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.photoURL} alt={user.displayName || 'User'} />
-                  <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
-                </Avatar>
-              )}
-               {pathname === '/home' && !user.photoURL && (
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
-                </Avatar>
-              )}
+          {!loading && user ? (
+            pathname === '/home' ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full p-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User'} />
+                      <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {user.displayName || "User"}
+                      </p>
+                      {user.email && (
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      )}
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={signOut} className="cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sign Out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
               <SignOutButton />
-            </>
-          )}
+            )
+          ) : null}
           {!loading && !user && (
             <Button asChild variant="outline" className="shadow-sm hover:shadow-md">
               <Link href="/signin">

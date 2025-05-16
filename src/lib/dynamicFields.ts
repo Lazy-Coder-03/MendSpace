@@ -21,15 +21,15 @@ export const getField2PlaceholderForm = (): string => "Describe your emotions an
 // For SubmissionForm (context: editing an existing submission)
 export const getField3LabelForm_Edit = (
   isCurrentUserAuthor: boolean,
-  originalAuthorDisplayName?: string | null,
-  currentUserDisplayName?: string | null
+  originalAuthorDisplayName?: string | null
+  // currentUserDisplayName parameter was unused and has been removed
 ): string => {
   if (isCurrentUserAuthor) {
     // Author is viewing/editing their submission, field3 is for the other person's defence
-    return `Defence by ${getOtherPerson(originalAuthorDisplayName)} (View Only)`;
+    return `Defence by ${getOtherPerson(originalAuthorDisplayName)} (Optional, View Only if Filled)`;
   } else {
     // The "other person" is editing, adding their defence for the original author
-    return `Your Defence of ${originalAuthorDisplayName || 'them'}`;
+    return `Your Defence of ${originalAuthorDisplayName || 'them'} (Optional)`;
   }
 };
 export const getField3PlaceholderForm_Edit = (
@@ -39,7 +39,7 @@ export const getField3PlaceholderForm_Edit = (
   if (isCurrentUserAuthor) {
     return `This field is for ${getOtherPerson(originalAuthorDisplayName)} to fill.`;
   } else {
-    return `Explain ${originalAuthorDisplayName || 'their'} perspective or actions, seeing it from their side.`;
+    return `Explain ${originalAuthorDisplayName || 'their'} perspective or actions, seeing it from their side. (Optional)`;
   }
 };
 

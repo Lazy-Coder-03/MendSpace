@@ -115,7 +115,7 @@ export function SubmissionForm({
     <Card className={`w-full shadow-xl ${inDialog ? 'bg-transparent border-0 shadow-none' : 'bg-card/90 backdrop-blur-sm'}`}>
       {!inDialog && ( 
         <CardHeader>
-          <CardTitle className="text-2xl text-primary">Honest Feelings Form Submission</CardTitle>
+          <CardTitle className="text-2xl text-primary">Share Your Feelings</CardTitle>
           <CardDescription className="text-muted-foreground">Fill in the details with honesty.</CardDescription>
         </CardHeader>
       )}

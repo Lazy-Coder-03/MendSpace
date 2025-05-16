@@ -2,7 +2,7 @@
 "use client";
 
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
@@ -13,7 +13,6 @@ import { Loader2 } from 'lucide-react';
 export function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user, loading, isAllowedUser } = useAuth();
   const router = useRouter();
-  // const pathname = usePathname(); // pathname is not directly used for redirect logic here, can be removed if not needed for other purposes
 
   useEffect(() => {
     // Only perform actions once the loading state from Firebase is resolved

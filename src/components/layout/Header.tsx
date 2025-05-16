@@ -44,7 +44,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)]"
+              className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)]" // Solid dark pastel lavender
             >
               <SheetHeader className="p-4 pb-2 border-b border-[hsl(270,60%,65%)]">
                 <SheetTitle className="text-accent-foreground">Menu</SheetTitle>
@@ -91,7 +91,10 @@ export function Header() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-amber-300" />
-                  <DropdownMenuItem onSelect={signOut} className="cursor-pointer text-amber-800 hover:!bg-amber-200 focus:!bg-amber-200">
+                  <DropdownMenuItem 
+                    onSelect={signOut} 
+                    className="cursor-pointer text-amber-800 hover:!bg-red-200 hover:!text-red-700 focus:!bg-red-200 focus:!text-red-700"
+                  >
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign Out</span>
                   </DropdownMenuItem>

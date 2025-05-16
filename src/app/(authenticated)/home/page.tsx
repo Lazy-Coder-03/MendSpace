@@ -69,7 +69,7 @@ export default function HomePage() {
           </h1>
         </div>
         <p className="text-lg text-muted-foreground mb-10 text-center">
-            Ready to share something new? Fill out the form below.
+            Ready to share what you feel? 
         </p>
       <SubmissionForm 
         onSubmit={handleNewSubmission as any} // Cast as any because the form data type for new submissions won't include field3

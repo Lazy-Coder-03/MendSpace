@@ -43,7 +43,7 @@ export function EditSubmissionDialog({ submission, isOpen, onOpenChange, onSave,
     dialogTitle = "Edit Your Submission";
     dialogDescription = `Update your statements and comments. ${otherPersonName}'s defence will be read-only.`;
   } else {
-    dialogTitle = `Add/Edit Defence for ${originalAuthorName}`;
+    dialogTitle = `Add/Edit Defence`; // Changed this line
     dialogDescription = `You are adding or editing the defence for ${originalAuthorName}'s entry. Other fields are read-only.`;
   }
 

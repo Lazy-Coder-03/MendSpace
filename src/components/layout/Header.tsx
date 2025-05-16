@@ -2,7 +2,6 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { SignOutButton } from '@/components/auth/SignOutButton';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { LogIn, Menu, LogOut } from 'lucide-react';
@@ -10,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Navigation } from './Navigation';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; // usePathname removed as it's no longer needed for this logic
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from '@/lib/utils';
 import {
@@ -21,11 +20,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+// SignOutButton import is removed as it's replaced by the DropdownMenu
+// import { SignOutButton } from '@/components/auth/SignOutButton'; 
 
 export function Header() {
   const { user, loading, signOut } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const pathname = usePathname();
   const router = useRouter();
 
   // Easter egg state
@@ -121,42 +121,38 @@ export function Header() {
         {/* Right: User Actions */}
         <div className="flex-shrink-0 flex items-center gap-3 sm:gap-4">
           {!loading && user ? (
-            pathname === '/home' ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User'} />
-                      <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-amber-100 border-amber-200" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal text-amber-800">
-                    <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">
-                        {user.displayName || "User"}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User'} />
+                    <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-amber-100 border-amber-200" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal text-amber-800">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">
+                      {user.displayName || "User"}
+                    </p>
+                    {user.email && (
+                      <p className="text-xs leading-none text-amber-700">
+                        {user.email}
                       </p>
-                      {user.email && (
-                        <p className="text-xs leading-none text-amber-700">
-                          {user.email}
-                        </p>
-                      )}
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-amber-300" />
-                  <DropdownMenuItem 
-                    onSelect={signOut} 
-                    className="cursor-pointer text-amber-800 hover:!bg-red-200 hover:!text-red-700 focus:!bg-red-200 focus:!text-red-700"
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sign Out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <SignOutButton />
-            )
+                    )}
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-amber-300" />
+                <DropdownMenuItem 
+                  onSelect={signOut} 
+                  className="cursor-pointer text-amber-800 hover:!bg-red-200 hover:!text-red-700 focus:!bg-red-200 focus:!text-red-700"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : null}
           {!loading && !user && (
             <Button asChild variant="outline" className="shadow-sm hover:shadow-md">

@@ -111,7 +111,6 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
         updatedAt: serverTimestamp() as any,
       };
 
-      // Only allow "other person" to edit field3 in this context
       const originalAuthorName = selectedSubmissionForEdit.displayName || selectedSubmissionForEdit.signature;
       const isCurrentUserTheOtherPersonForSelected = user.uid !== selectedSubmissionForEdit.uid && 
                                                user.displayName?.toLowerCase().startsWith(getOtherPerson(originalAuthorName).toLowerCase());
@@ -119,7 +118,7 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
       if (isCurrentUserTheOtherPersonForSelected) {
         dataToUpdate.field3 = data.field3;
       } else {
-         toast({ title: 'Permission Denied', description: 'You can only edit your own defence.', variant: 'destructive' });
+         toast({ title: 'Permission Denied', description: 'You can only edit the defence for an entry you did not author.', variant: 'destructive' });
          setIsSavingEdit(false);
          return;
       }
@@ -132,7 +131,7 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
       });
       setIsEditDialogOpen(false);
       setSelectedSubmissionForEdit(null);
-      fetchSubmissions(); // Refetch to show updated data
+      fetchSubmissions(); 
     } catch (error) {
       console.error('Error updating submission: ', error);
       toast({ title: 'Error', description: 'Failed to update defence.', variant: 'destructive' });
@@ -203,12 +202,12 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead className="w-[50px] text-center border-r">#</TableHead>
-                  <TableHead className="border-r whitespace-pre-wrap break-words">{getField1DisplayLabel(participantFirstName)}</TableHead>
-                  <TableHead className="border-r whitespace-pre-wrap break-words">{getField2DisplayLabel(participantFirstName)}</TableHead>
-                  <TableHead className="border-r whitespace-pre-wrap break-words">{getField3DisplayLabel(participantFirstName)}</TableHead>
-                  <TableHead className="border-r whitespace-pre-wrap break-words">{getCommentsDisplayLabel()}</TableHead>
-                  <TableHead className="w-[180px]">Timestamp</TableHead>
+                  <TableHead className="w-[40px] text-center border-r px-2 py-3">#</TableHead>
+                  <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words">{getField1DisplayLabel(participantFirstName)}</TableHead>
+                  <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words">{getField2DisplayLabel(participantFirstName)}</TableHead>
+                  <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words">{getField3DisplayLabel(participantFirstName)}</TableHead>
+                  <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words">{getCommentsDisplayLabel()}</TableHead>
+                  <TableHead className="px-2 py-3 whitespace-pre-wrap break-words">Timestamp</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -221,12 +220,12 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
 
                   return (
                     <TableRow key={sub.id} className="hover:bg-accent/50">
-                      <TableCell className="text-center font-medium border-r">{index + 1}</TableCell>
-                      <TableCell className="font-medium whitespace-pre-wrap break-words border-r">{sub.field1 || 'N/A'}</TableCell>
-                      <TableCell className="whitespace-pre-wrap break-words border-r">{sub.field2 || 'N/A'}</TableCell>
+                      <TableCell className="text-center font-medium border-r px-2 py-3">{index + 1}</TableCell>
+                      <TableCell className="font-medium whitespace-pre-wrap break-words border-r px-2 py-3">{sub.field1 || 'N/A'}</TableCell>
+                      <TableCell className="whitespace-pre-wrap break-words border-r px-2 py-3">{sub.field2 || 'N/A'}</TableCell>
                       <TableCell
                         className={cn(
-                          "whitespace-pre-wrap break-words border-r",
+                          "whitespace-pre-wrap break-words border-r px-2 py-3",
                           isCurrentUserTheOtherPerson && "cursor-pointer hover:bg-accent/70 focus:bg-accent/70"
                         )}
                         onClick={() => {
@@ -243,8 +242,8 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
                       >
                         {sub.field3 || (isCurrentUserTheOtherPerson ? '(Click to add defence)' : 'N/A')}
                       </TableCell>
-                      <TableCell className="whitespace-pre-wrap break-words border-r">{sub.comments || 'N/A'}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground whitespace-pre-wrap break-words">{formatTimestamp(sub.createdAt)}</TableCell>
+                      <TableCell className="whitespace-pre-wrap break-words border-r px-2 py-3">{sub.comments || 'N/A'}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground whitespace-pre-wrap break-words px-2 py-3">{formatTimestamp(sub.createdAt)}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -296,5 +295,3 @@ export default function SubmissionsPage() {
     </div>
   );
 }
-
-    

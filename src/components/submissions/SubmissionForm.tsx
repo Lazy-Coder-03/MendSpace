@@ -17,13 +17,15 @@ import {
   getField1LabelForm, getField1PlaceholderForm,
   getField2LabelForm, getField2PlaceholderForm,
   getField3LabelForm_Edit, getField3PlaceholderForm_Edit,
-  getCommentsLabelForm, getCommentsPlaceholderForm
+  getCommentsLabelForm, getCommentsPlaceholderForm,
+  getOtherPerson
 } from '@/lib/dynamicFields';
+import { cn } from '@/lib/utils'; // Added missing import
 
 const formSchema = z.object({
   field1: z.string().min(1, 'This field is required.'),
   field2: z.string().min(1, 'This field is required.'),
-  field3: z.string().optional(), // Remains optional in schema, controlled by form logic
+  field3: z.string().optional(), // Optional, primarily edited by the other person
   comments: z.string().optional(),
 });
 
@@ -70,16 +72,23 @@ export function SubmissionForm({
       console.error("User not available for submission");
       return;
     }
-    await onSubmit(values, user.displayName); // Pass current user's signature
+    // Pass current user's display name as signature for the action (submit or edit)
+    // The originalAuthorDisplayName is used for context (labels, who can edit what)
+    await onSubmit(values, user.displayName); 
     if (!isEditing) { // Only reset form if it's a new submission
       form.reset({ field1: '', field2: '', field3: '', comments: '' }); 
     }
   };
 
   const inDialog = isEditing; 
-  const isCurrentUserAuthor = isEditing && user?.uid === originalAuthorUid;
-  const canEditMainFields = !isEditing || (isEditing && isCurrentUserAuthor);
-  const canEditDefenceField = isEditing && !isCurrentUserAuthor;
+  const isCurrentUserTheOriginalAuthor = isEditing && user?.uid === originalAuthorUid;
+  // The "other person" is determined by comparing the current user's name to the original author's name
+  const otherPersonForThisSubmission = getOtherPerson(originalAuthorDisplayName);
+  const isCurrentUserTheOtherPerson = isEditing && user?.displayName?.toLowerCase().startsWith(otherPersonForThisSubmission.toLowerCase()) && user?.uid !== originalAuthorUid;
+
+  // Determine which fields are editable based on the user's role in this specific submission
+  const canEditMainFields = !isEditing || isCurrentUserTheOriginalAuthor; // Field1, Field2, Comments
+  const canEditDefenceField = isEditing && isCurrentUserTheOtherPerson; // Field3 (Defence)
 
   const labelClasses = inDialog ? "text-neutral-700" : "text-foreground/90";
   const getTextInputClasses = (isDisabled: boolean) => 
@@ -94,10 +103,13 @@ export function SubmissionForm({
     ? "bg-neutral-100 cursor-not-allowed border-2 border-black text-black opacity-70 focus-visible:ring-neutral-400"
     : "bg-muted/50 cursor-not-allowed";
 
-  let submitButtonText = isEditing ? 'Update Submission' : 'Submit Entry';
+  let submitButtonText = isEditing ? 'Update Entry' : 'Submit Entry';
   let SubmitIcon = isEditing ? Edit3 : Send;
 
-  if (isEditing && !isCurrentUserAuthor) {
+  if (isCurrentUserTheOriginalAuthor && isEditing) {
+    submitButtonText = 'Update Your Entry';
+    SubmitIcon = Edit3;
+  } else if (isCurrentUserTheOtherPerson && isEditing) {
     submitButtonText = 'Save Defence';
     SubmitIcon = ShieldCheck;
   }
@@ -137,10 +149,10 @@ export function SubmissionForm({
               name="field2"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className={labelClasses}>{getField2LabelForm()}</FormLabel>
+                  <FormLabel className={labelClasses}>{getField2LabelForm(originalAuthorDisplayName || user?.displayName)}</FormLabel>
                   <FormControl>
                     <Textarea 
-                      placeholder={getField2PlaceholderForm()} 
+                      placeholder={getField2PlaceholderForm(originalAuthorDisplayName || user?.displayName)} 
                       {...field} 
                       className={getTextInputClasses(!canEditMainFields)}
                       disabled={!canEditMainFields}
@@ -151,21 +163,21 @@ export function SubmissionForm({
               )}
             />
             
-            {isEditing && ( // Only show Field 3 if editing
+            {isEditing && ( // Field 3 (Defence) is only shown when editing
               <FormField
                 control={form.control}
                 name="field3"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className={labelClasses}>
-                      {getField3LabelForm_Edit(isCurrentUserAuthor, originalAuthorDisplayName, user?.displayName)}
+                      {getField3LabelForm_Edit(isCurrentUserTheOriginalAuthor, originalAuthorDisplayName, user?.displayName)}
                     </FormLabel>
                     <FormControl>
                       <Textarea 
-                        placeholder={getField3PlaceholderForm_Edit(isCurrentUserAuthor, originalAuthorDisplayName)} 
+                        placeholder={getField3PlaceholderForm_Edit(isCurrentUserTheOriginalAuthor, originalAuthorDisplayName)} 
                         {...field} 
-                        className={getTextInputClasses(!canEditDefenceField)} // Enabled if current user is NOT author
-                        disabled={!canEditDefenceField} // Enabled if current user is NOT author
+                        className={getTextInputClasses(!canEditDefenceField)} 
+                        disabled={!canEditDefenceField} 
                       />
                     </FormControl>
                     <FormMessage />
@@ -194,7 +206,7 @@ export function SubmissionForm({
             />
 
             <FormItem>
-              <FormLabel className={labelClasses}>{isEditing ? "Entry by" : "Signature"}</FormLabel>
+              <FormLabel className={labelClasses}>{isEditing ? "Original Entry by" : "Your Signature"}</FormLabel>
               <Input 
                 value={isEditing ? (originalAuthorDisplayName || 'Loading...') : (user?.displayName || 'Loading...')} 
                 readOnly 
@@ -206,14 +218,14 @@ export function SubmissionForm({
               type="submit" 
               variant="default" 
               className="w-full py-3 text-base shadow-lg" 
-              disabled={isLoading}
+              disabled={isLoading || (isEditing && !canEditMainFields && !canEditDefenceField)} // Also disable if no editable fields are available for the user
             >
               {isLoading ? (
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
               ) : (
                 <SubmitIcon className="mr-2 h-5 w-5" />
               )}
-              {isLoading ? (isEditing ? (isCurrentUserAuthor ? 'Updating...' : 'Saving Defence...') : 'Submitting...') : submitButtonText}
+              {isLoading ? (isEditing ? (isCurrentUserTheOriginalAuthor ? 'Updating...' : 'Saving Defence...') : 'Submitting...') : submitButtonText}
             </Button>
           </form>
         </Form>
@@ -221,3 +233,4 @@ export function SubmissionForm({
     </Card>
   );
 }
+

@@ -111,9 +111,24 @@ export function Header() {
                     <AccordionTrigger className="text-md font-semibold text-accent-foreground/90 hover:text-accent-foreground">
                       Terms and Conditions
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionContent className="space-y-2">
                       <p className="text-xs leading-relaxed text-accent-foreground/80">
-                        The parties involved do not intend on attack or blame or to defend , they just intend on vocalising their feelings. They intend on feeling heard , and their needs being met . Anybody’s feeling is not to be taken as an attack , as it is not, it's merely an unmet need.  Refrain from trying to fix your language or feeling, anything you feel is something you write .  Use of any language, to fill this is allowed . Both parties are required to fill this up after every argument/disagreement because they love each other and are willing to make this work.
+                        The parties involved intend to vocalize their feelings, not to attack, blame, or defend.
+                      </p>
+                      <p className="text-xs leading-relaxed text-accent-foreground/80">
+                        The goal is for each person to feel heard and for their needs to be met.
+                      </p>
+                      <p className="text-xs leading-relaxed text-accent-foreground/80">
+                        Anybody’s feeling is not to be taken as an attack; it is merely an expression of an unmet need.
+                      </p>
+                      <p className="text-xs leading-relaxed text-accent-foreground/80">
+                        Refrain from trying to "fix" your language or feeling. Write whatever you feel, authentically.
+                      </p>
+                      <p className="text-xs leading-relaxed text-accent-foreground/80">
+                        Use of any language to fill this form is allowed.
+                      </p>
+                      <p className="text-xs leading-relaxed text-accent-foreground/80">
+                        Both parties are required to fill this up after every argument/disagreement because they love each other and are willing to make this work.
                       </p>
                     </AccordionContent>
                   </AccordionItem>
@@ -124,13 +139,12 @@ export function Header() {
                     <AccordionContent>
                       <div className="text-xs leading-relaxed text-accent-foreground/80 space-y-2">
                         <p>When making an entry, you will fill out:</p>
-                        <ul className="list-disc list-inside pl-4">
+                        <ul className="list-disc list-inside pl-4 space-y-1">
                           <li>What the other person said or did.</li>
                           <li>What you felt in response.</li>
                           <li>Any additional comments (optional).</li>
                         </ul>
                         <p>The 'In Your Defence' field is to be filled out later by the other participant when they view the entry.</p>
-                        <p>You can customise your table with any colour/font of your liking.</p>
                         <p>After an entry is complete (both sides shared), a discussion should follow where both parties are given space and time to feel justified and talk about things that bother them.</p>
                         <p>Entries should be made as soon as conveniently possible after a conflict or disagreement.</p>
                       </div>

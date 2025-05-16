@@ -99,7 +99,7 @@ export function Header() {
               </SheetHeader>
               <div className="p-4">
                  <Link href="/home" className="flex items-center gap-2 text-2xl font-bold text-primary hover:text-primary/80 transition-colors mb-6" onClick={handleLinkClick}>
-                    <Image src="/logo.png" alt="Mendspace Logo" width={40} height={32} priority data-ai-hint="monogram letter M" />
+                    <Image src="/logo.png" alt="Mendspace Logo" width={40} height={32} style={{ height: "auto" }} priority data-ai-hint="monogram letter M" />
                     <span>Mendspace</span>
                   </Link>
                 <Navigation onLinkClick={handleLinkClick} />

@@ -202,12 +202,12 @@ function ParticipantSubmissionsSection({ participantFirstName, title }: Particip
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead className="w-[40px] text-center border-r px-2 py-3">#</TableHead>
-                  <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words">{getField1DisplayLabel(participantFirstName)}</TableHead>
-                  <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words">{getField2DisplayLabel(participantFirstName)}</TableHead>
-                  <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words">{getField3DisplayLabel(participantFirstName)}</TableHead>
-                  <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words">{getCommentsDisplayLabel()}</TableHead>
-                  <TableHead className="px-2 py-3 whitespace-pre-wrap break-words">Timestamp</TableHead>
+ <TableHead className="text-center border-r px-2 py-3 min-w-[40px]">#</TableHead>
+ <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[100px] max-w-[200px]">{getField1DisplayLabel(participantFirstName)}</TableHead>
+ <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[100px] max-w-[200px]">{getField2DisplayLabel(participantFirstName)}</TableHead>
+ <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[100px] max-w-[200px]">{getField3DisplayLabel(participantFirstName)}</TableHead>
+ <TableHead className="border-r px-2 py-3 whitespace-pre-wrap break-words min-w-[100px] max-w-[200px]">{getCommentsDisplayLabel()}</TableHead>
+ <TableHead className="px-2 py-3 whitespace-pre-wrap break-words min-w-[150px]">Timestamp</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

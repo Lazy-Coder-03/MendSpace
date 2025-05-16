@@ -21,7 +21,7 @@ export default function AuthenticatedLayout({
           </div>
         </main>
         <footer className="text-center py-6 text-muted-foreground text-sm border-t border-border mt-auto">
-          © {new Date().getFullYear()} Mendspace. All rights reserved.
+          © {new Date().getFullYear()} Mendspace. All rights and wrongs reserved made with Love.
         </footer>
       </div>
     </AuthGuard>

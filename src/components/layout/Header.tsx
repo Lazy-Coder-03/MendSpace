@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SignOutButton } from '@/components/auth/SignOutButton';
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Navigation } from './Navigation';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from '@/lib/utils';
 import {
@@ -26,10 +26,51 @@ export function Header() {
   const { user, loading, signOut } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Easter egg state
+  const [logoClickCount, setLogoClickCount] = useState(0);
+  const [easterEggActive, setEasterEggActive] = useState(false);
+  const [countdown, setCountdown] = useState(5);
+  const [showRedirectMessage, setShowRedirectMessage] = useState(false);
 
   const handleLinkClick = () => {
     setIsSheetOpen(false);
   };
+
+  const handleLogoClick = (event: React.MouseEvent) => {
+    if (easterEggActive) { // If easter egg is already running, prevent further clicks/navigation
+      event.preventDefault();
+      return;
+    }
+
+    const newClickCount = logoClickCount + 1;
+    setLogoClickCount(newClickCount);
+
+    if (newClickCount >= 5) {
+      event.preventDefault(); // Prevent navigation to /home
+      setEasterEggActive(true);
+      setShowRedirectMessage(true);
+      setCountdown(5);
+    }
+  };
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (easterEggActive && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prevCountdown) => prevCountdown - 1);
+      }, 1000);
+    } else if (easterEggActive && countdown === 0) {
+      router.push('https://drive.google.com/drive/folders/1QMxJFmkSkFO1egrtTD4HfeP25pTEp6SW?usp=sharing');
+      // Reset state after redirect attempt (component might unmount)
+      setEasterEggActive(false);
+      setShowRedirectMessage(false);
+      setLogoClickCount(0); 
+    }
+    return () => clearInterval(timer);
+  }, [easterEggActive, countdown, router]);
+
 
   return (
     <header className="bg-card/80 backdrop-blur-md shadow-md sticky top-0 z-50">
@@ -45,7 +86,7 @@ export function Header() {
             </SheetTrigger>
             <SheetContent
               side="left"
-              className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)]"
+              className="w-[280px] sm:w-[320px] p-0 bg-[hsl(270,60%,75%)] border-r border-[hsl(270,60%,65%)]" // Solid dark pastel lavender
             >
               <SheetHeader className="p-4 pb-2 border-b border-[hsl(270,60%,65%)]">
                 <SheetTitle className="text-accent-foreground">Menu</SheetTitle>
@@ -63,10 +104,17 @@ export function Header() {
 
         {/* Center: Logo and App Name */}
         <div className="flex-1 flex justify-center">
-          <Link href="/home" className="flex items-center gap-2 text-3xl font-bold text-primary hover:text-primary/80 transition-colors">
+          <Link 
+            href="/home" 
+            className="flex items-center gap-2 text-3xl font-bold text-primary hover:text-primary/80 transition-colors"
+            onClick={handleLogoClick}
+          >
             <Image src="/logo.png" alt="Mendspace Logo" width={49} height={40} priority data-ai-hint="monogram letter M" />
-            {/* "Mendspace" text is now always visible */}
-            <span>Mendspace</span>
+            {showRedirectMessage ? (
+              <span className="text-xl sm:text-2xl">taking you back..... {countdown > 0 ? `${countdown}s` : ''}</span>
+            ) : (
+              <span>Mendspace</span>
+            )}
           </Link>
         </div>
 

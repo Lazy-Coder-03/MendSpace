@@ -9,13 +9,25 @@ import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/firebase/config';
 import type { NewSubmission } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import Image from 'next/image';
+
+const getInitials = (name: string | null | undefined) => {
+  if (!name) return '';
+  const names = name.split(' ');
+  let initials = names[0].substring(0, 1).toUpperCase();
+  if (names.length > 1) {
+    initials += names[names.length - 1].substring(0, 1).toUpperCase();
+  }
+  return initials;
+};
 
 export default function HomePage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleNewSubmission = async (data: Omit<NewSubmission, 'uid' | 'displayName' | 'signature' | 'createdAt'>, signature: string) => {
+  const handleNewSubmission = async (data: Omit<NewSubmission, 'uid' | 'displayName' | 'signature' | 'createdAt' | 'photoURL'>, signature: string) => {
     if (!user) {
       toast({ title: 'Error', description: 'You must be logged in to submit.', variant: 'destructive' });
       return;
@@ -26,6 +38,7 @@ export default function HomePage() {
         ...data,
         uid: user.uid,
         displayName: user.displayName || 'Anonymous',
+        photoURL: user.photoURL || null,
         signature: signature,
         createdAt: serverTimestamp() as any, // Firestore will convert this
       };
@@ -56,9 +69,15 @@ export default function HomePage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-bold mb-8 text-center text-primary">
-            Welcome, <span className="font-semibold">{user.displayName}</span>!
-        </h1>
+        <div className="flex items-center justify-center mb-8 space-x-3">
+          <Avatar className="h-16 w-16 border-2 border-primary/50 shadow-md">
+            <AvatarImage src={user.photoURL || undefined} alt={user.displayName || 'User'} />
+            <AvatarFallback>{getInitials(user.displayName)}</AvatarFallback>
+          </Avatar>
+          <h1 className="text-4xl font-bold text-primary">
+              Welcome, <span className="font-semibold">{user.displayName}</span>!
+          </h1>
+        </div>
         <p className="text-lg text-muted-foreground mb-10 text-center">
             Ready to share something new? Fill out the form below.
         </p>
@@ -66,5 +85,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-    

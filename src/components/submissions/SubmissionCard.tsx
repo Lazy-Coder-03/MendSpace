@@ -29,6 +29,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const formatTimestamp = (timestamp: FirestoreTimestamp | undefined, label: string = "Submitted"): string => {
   if (!timestamp) return `${label}: N/A`;
@@ -47,6 +48,16 @@ const formatTimestamp = (timestamp: FirestoreTimestamp | undefined, label: strin
     console.error("Error formatting timestamp:", error);
     return `${label}: Date Error`;
   }
+};
+
+const getInitials = (name: string | null | undefined) => {
+  if (!name) return '';
+  const names = name.split(' ');
+  let initials = names[0].substring(0, 1).toUpperCase();
+  if (names.length > 1) {
+    initials += names[names.length - 1].substring(0, 1).toUpperCase();
+  }
+  return initials;
 };
 
 
@@ -111,8 +122,16 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
     <>
       <Card className="mb-6 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card/90 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="text-xl text-primary flex justify-between items-center">
-            Entry by {authorName}
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-3">
+              <Avatar className="h-10 w-10 border border-primary/30">
+                <AvatarImage src={submission.photoURL || undefined} alt={authorName} />
+                <AvatarFallback>{getInitials(authorName)}</AvatarFallback>
+              </Avatar>
+              <CardTitle className="text-xl text-primary">
+                Entry by {authorName}
+              </CardTitle>
+            </div>
             {canEditOrDelete && (
               <div className="flex items-center space-x-1">
                 <Button variant="ghost" size="icon" onClick={() => setIsEditDialogOpen(true)} className="text-primary hover:text-accent-foreground hover:bg-accent">
@@ -154,8 +173,8 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
                 </AlertDialog>
               </div>
             )}
-          </CardTitle>
-          <CardDescription className="text-xs text-muted-foreground flex items-center space-x-4 pt-1">
+          </div>
+          <CardDescription className="text-xs text-muted-foreground flex items-center space-x-4 pt-1 mt-2">
             <span><UserCircle className="inline-block mr-1 h-4 w-4" />UID: {submission.uid.substring(0,8)}...</span>
             <span><Clock className="inline-block mr-1 h-4 w-4" />{formatTimestamp(submission.createdAt, "Created")}</span>
             {submission.updatedAt && <span><CheckCircle className="inline-block mr-1 h-4 w-4" />{formatTimestamp(submission.updatedAt, "Updated")}</span>}
@@ -195,4 +214,3 @@ export function SubmissionCard({ submission, onSubmissionUpdate }: SubmissionCar
     </>
   );
 }
-

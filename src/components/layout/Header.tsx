@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Navigation } from './Navigation';
-import { useRouter, usePathname } from 'next/navigation'; // Added usePathname
+import { useRouter, usePathname } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from '@/lib/utils';
 import {
@@ -108,10 +108,10 @@ export function Header() {
               <ScrollArea className="flex-grow p-4 overflow-y-auto">
                 <Accordion type="multiple" className="w-full">
                   <AccordionItem value="item-1">
-                    <AccordionTrigger className="text-md font-semibold text-accent-foreground/90 hover:text-accent-foreground">
+                    <AccordionTrigger className="text-md font-semibold text-accent-foreground/90 hover:text-accent-foreground pl-4">
                       Terms and Conditions
                     </AccordionTrigger>
-                    <AccordionContent className="space-y-2">
+                    <AccordionContent className="space-y-2 pl-4">
                       <p className="text-xs leading-relaxed text-accent-foreground/80">
                         The parties involved intend to vocalize their feelings, not to attack, blame, or defend.
                       </p>
@@ -133,10 +133,10 @@ export function Header() {
                     </AccordionContent>
                   </AccordionItem>
                   <AccordionItem value="item-2">
-                    <AccordionTrigger className="text-md font-semibold text-accent-foreground/90 hover:text-accent-foreground">
+                    <AccordionTrigger className="text-md font-semibold text-accent-foreground/90 hover:text-accent-foreground pl-4">
                       Rules
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <AccordionContent className="pl-4">
                       <div className="text-xs leading-relaxed text-accent-foreground/80 space-y-2">
                         <p>When making an entry, you will fill out:</p>
                         <ul className="list-disc list-inside pl-4 space-y-1">

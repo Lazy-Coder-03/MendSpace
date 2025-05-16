@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Navigation } from './Navigation';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getInitials } from '@/lib/utils';
 import {
@@ -22,12 +22,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export function Header() {
   const { user, loading, signOut } = useAuth();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
 
   // Easter egg state
   const [logoClickCount, setLogoClickCount] = useState(0);
@@ -101,20 +106,28 @@ export function Header() {
               </div>
               <Separator className="my-2 bg-[hsl(270,60%,65%)]" />
               <ScrollArea className="flex-grow p-4 overflow-y-auto">
-                <div className="text-sm text-accent-foreground/90 space-y-4">
-                  <div>
-                    <h3 className="font-semibold text-md mb-1">Terms and Conditions:</h3>
-                    <p className="text-xs leading-relaxed">
-                      The parties involved do not intend on attack or blame or to defend , they just intend on vocalising their feelings. They intend on feeling heard , and their needs being met . Anybody’s feeling is not to be taken as an attack , as it is not, it's merely an unmet need.  Refrain from trying to fix your language or feeling, anything you feel is something you write .  Use of any language, to fill this is allowed . Both parties are required to fill this up after every argument/disagreement because they love each other and are willing to make this work.
-                    </p>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-md mb-1">Rules:</h3>
-                    <p className="text-xs leading-relaxed">
-                      In the table given below , where you have three columns , in one side you're asked to fill up,(i) what the other person said ,(ii) what you felt ,(iii) in the defense of the other  person .  The first two columns are to be filled by one and the third column is to be filled by the other participant .  You can customise your table with any colour/font of your liking . After this is filled completely , a discussion is to be followed where both parties are given space and time to i) to feel justified or ii)talk about things that bother them .  Beside your signature , do drop an emoji of your liking .  This is to be filled at the soonest possible time convenient after a conflict of interest.
-                    </p>
-                  </div>
-                </div>
+                <Accordion type="multiple" className="w-full">
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger className="text-md font-semibold text-accent-foreground/90 hover:text-accent-foreground">
+                      Terms and Conditions
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="text-xs leading-relaxed text-accent-foreground/80">
+                        The parties involved do not intend on attack or blame or to defend , they just intend on vocalising their feelings. They intend on feeling heard , and their needs being met . Anybody’s feeling is not to be taken as an attack , as it is not, it's merely an unmet need.  Refrain from trying to fix your language or feeling, anything you feel is something you write .  Use of any language, to fill this is allowed . Both parties are required to fill this up after every argument/disagreement because they love each other and are willing to make this work.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-2">
+                    <AccordionTrigger className="text-md font-semibold text-accent-foreground/90 hover:text-accent-foreground">
+                      Rules
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="text-xs leading-relaxed text-accent-foreground/80">
+                        In the table given below , where you have three columns , in one side you're asked to fill up,(i) what the other person said ,(ii) what you felt ,(iii) in the defense of the other  person .  The first two columns are to be filled by one and the third column is to be filled by the other participant .  You can customise your table with any colour/font of your liking . After this is filled completely , a discussion is to be followed where both parties are given space and time to i) to feel justified or ii)talk about things that bother them .  Beside your signature , do drop an emoji of your liking .  This is to be filled at the soonest possible time convenient after a conflict of interest.
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </ScrollArea>
             </SheetContent>
           </Sheet>
@@ -184,3 +197,4 @@ export function Header() {
     </header>
   );
 }
+

@@ -18,8 +18,6 @@ export function useNotifications() {
   const requestNotificationPermission = useCallback(async () => {
     if (!('Notification' in window)) {
       console.warn('This browser does not support desktop notification');
-      // setNotificationPermission is already handling this in useEffect, 
-      // but we can be explicit if preferred for unsupported case.
       return 'denied'; 
     }
 
@@ -28,7 +26,6 @@ export function useNotifications() {
       return 'granted';
     }
 
-    // Only request if not denied. If denied, user has to change it in browser settings.
     if (Notification.permission !== 'denied') {
       const permission = await Notification.requestPermission();
       setNotificationPermission(permission);

@@ -15,6 +15,10 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: 'Mendspace',
   description: 'A gentle space for your thoughts.',
+  manifest: '/manifest.json', // Added manifest link
+  icons: {
+    icon: '/favicon.ico', // Reference to your .ico file in public folder
+  },
 };
 
 export default function RootLayout({

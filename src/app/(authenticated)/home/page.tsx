@@ -64,7 +64,7 @@ export default function HomePage() {
   return (
     <div className="max-w-2xl mx-auto">
         <div className="flex items-center justify-center mb-8 space-x-3">
-          <h1 className="text-4xl font-bold text-primary">
+          <h1 className="text-4xl font-bold text-primary text-center">
               Welcome, <span className="font-semibold">{firstName}</span>!
           </h1>
         </div>
@@ -74,7 +74,7 @@ export default function HomePage() {
       <SubmissionForm 
         onSubmit={handleNewSubmission as any} // Cast as any because the form data type for new submissions won't include field3
         isLoading={isLoading} 
-        originalAuthorDisplayName={user.displayName} // For consistency, though not strictly needed for new form
+        originalAuthorDisplayName={user.displayName} 
       />
     </div>
   );

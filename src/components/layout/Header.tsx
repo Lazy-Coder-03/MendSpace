@@ -77,21 +77,21 @@ export function Header() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end" forceMount>
-                  <DropdownMenuLabel className="font-normal">
+                <DropdownMenuContent className="w-56 bg-amber-100 border-amber-200" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal text-amber-800">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
                         {user.displayName || "User"}
                       </p>
                       {user.email && (
-                        <p className="text-xs leading-none text-muted-foreground">
+                        <p className="text-xs leading-none text-amber-700">
                           {user.email}
                         </p>
                       )}
                     </div>
                   </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onSelect={signOut} className="cursor-pointer">
+                  <DropdownMenuSeparator className="bg-amber-300" />
+                  <DropdownMenuItem onSelect={signOut} className="cursor-pointer text-amber-800 hover:!bg-amber-200 focus:!bg-amber-200">
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sign Out</span>
                   </DropdownMenuItem>
